@@ -1,4 +1,4 @@
 package com.nvkproject3.controller.admin;
 
-public class AdminHomeController {
+public class AdminDashboardController {
 }

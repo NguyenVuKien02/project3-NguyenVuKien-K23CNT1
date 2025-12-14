@@ -1,4 +1,4 @@
 package com.nvkproject3.dto;
 
-public class GioHangItemDTO {
+public class DanhGiaDTO {
 }
