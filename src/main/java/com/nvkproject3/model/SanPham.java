@@ -1,28 +1,24 @@
 package com.nvkproject3.model;
 
 import jakarta.persistence.*;
-import lombok.Data;
-import java.util.List;
 
 @Entity
 @Table(name = "san_pham")
-@Data
 public class SanPham {
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+    private Integer id;
 
-    @Column(nullable = false)
     private String ten;
 
     @Column(name = "ma_sku", unique = true)
     private String maSku;
 
-    @Column(nullable = false)
     private Double gia;
 
-    @Column(name = "so_luong_ton", columnDefinition = "INT DEFAULT 0")
-    private Integer soLuongTon;
+    @Column(name = "so_luong_ton")
+    private Integer soLuongTon = 0;
 
     @Column(name = "nha_xuat_ban")
     private String nhaXuatBan;
@@ -45,12 +41,103 @@ public class SanPham {
     @Column(name = "anh_dai_dien")
     private String anhDaiDien;
 
-    @OneToMany(mappedBy = "sanPham", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
-    private List<SanPhamAnh> anhChiTiets;
+    // Constructors
+    public SanPham() {}
 
-    @OneToMany(mappedBy = "sanPham", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
-    private List<SanPhamTacGia> tacGias;
+    // Getters and Setters
+    public Integer getId() {
+        return id;
+    }
 
-    @OneToMany(mappedBy = "sanPham", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
-    private List<SanPhamDanhMuc> danhMucs;
+    public void setId(Integer id) {
+        this.id = id;
+    }
+
+    public String getTen() {
+        return ten;
+    }
+
+    public void setTen(String ten) {
+        this.ten = ten;
+    }
+
+    public String getMaSku() {
+        return maSku;
+    }
+
+    public void setMaSku(String maSku) {
+        this.maSku = maSku;
+    }
+
+    public Double getGia() {
+        return gia;
+    }
+
+    public void setGia(Double gia) {
+        this.gia = gia;
+    }
+
+    public Integer getSoLuongTon() {
+        return soLuongTon;
+    }
+
+    public void setSoLuongTon(Integer soLuongTon) {
+        this.soLuongTon = soLuongTon;
+    }
+
+    public String getNhaXuatBan() {
+        return nhaXuatBan;
+    }
+
+    public void setNhaXuatBan(String nhaXuatBan) {
+        this.nhaXuatBan = nhaXuatBan;
+    }
+
+    public Integer getNamXuatBan() {
+        return namXuatBan;
+    }
+
+    public void setNamXuatBan(Integer namXuatBan) {
+        this.namXuatBan = namXuatBan;
+    }
+
+    public Integer getSoTrang() {
+        return soTrang;
+    }
+
+    public void setSoTrang(Integer soTrang) {
+        this.soTrang = soTrang;
+    }
+
+    public Double getTrongLuong() {
+        return trongLuong;
+    }
+
+    public void setTrongLuong(Double trongLuong) {
+        this.trongLuong = trongLuong;
+    }
+
+    public String getNgonNgu() {
+        return ngonNgu;
+    }
+
+    public void setNgonNgu(String ngonNgu) {
+        this.ngonNgu = ngonNgu;
+    }
+
+    public String getMoTa() {
+        return moTa;
+    }
+
+    public void setMoTa(String moTa) {
+        this.moTa = moTa;
+    }
+
+    public String getAnhDaiDien() {
+        return anhDaiDien;
+    }
+
+    public void setAnhDaiDien(String anhDaiDien) {
+        this.anhDaiDien = anhDaiDien;
+    }
 }

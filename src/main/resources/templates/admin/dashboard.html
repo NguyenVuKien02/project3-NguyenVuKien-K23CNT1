@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Dashboard</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #f5f5f5;
+        }
+
+        .navbar {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 15px 30px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+
+        .navbar h1 {
+            font-size: 24px;
+        }
+
+        .navbar .user-info {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .btn-logout {
+            background-color: rgba(255,255,255,0.2);
+            color: white;
+            padding: 8px 20px;
+            border: 1px solid white;
+            border-radius: 5px;
+            text-decoration: none;
+            transition: background-color 0.3s;
+        }
+
+        .btn-logout:hover {
+            background-color: rgba(255,255,255,0.3);
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 50px auto;
+            padding: 0 20px;
+        }
+
+        .welcome-card {
+            background: white;
+            padding: 40px;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            text-align: center;
+        }
+
+        .welcome-card h2 {
+            color: #333;
+            margin-bottom: 10px;
+        }
+
+        .welcome-card p {
+            color: #666;
+            font-size: 16px;
+        }
+
+        .badge {
+            display: inline-block;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 5px 15px;
+            border-radius: 20px;
+            font-size: 14px;
+            margin-top: 15px;
+        }
+    </style>
+</head>
+<body>
+<nav class="navbar">
+    <h1>🎯 Admin Dashboard</h1>
+    <div class="user-info">
+        <span>👤 <span th:text="${username}"></span></span>
+        <a href="/logout" class="btn-logout">Đăng xuất</a>
+    </div>
+</nav>
+
+<div class="container">
+    <div class="welcome-card">
+        <h2>Chào mừng Admin!</h2>
+        <p>Bạn đã đăng nhập thành công với quyền quản trị viên.</p>
+        <span class="badge">ADMIN</span>
+        <p style="margin-top: 30px; color: #999; font-size: 14px;">
+            Các chức năng quản lý sẽ được phát triển ở bước tiếp theo.
+        </p>
+    </div>
+</div>
+</body>
+</html>

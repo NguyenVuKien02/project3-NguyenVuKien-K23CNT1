@@ -1,66 +1,117 @@
 package com.nvkproject3.service;
 
-import com.nvkproject3.model.*;
-import com.nvkproject3.repository.*;
-import lombok.RequiredArgsConstructor;
+import com.nvkproject3.config.CustomUserDetails;
+import com.nvkproject3.model.GioHang;
+import com.nvkproject3.model.GioHangChiTiet;
+import com.nvkproject3.repository.GioHangChiTietRepository;
+import com.nvkproject3.repository.GioHangRepository;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import java.util.Optional;
+
+import java.time.LocalDateTime;
+import java.util.List;
 
 @Service
-@RequiredArgsConstructor
 public class GioHangService {
 
-    private final GioHangRepository gioHangRepository;
-    private final GioHangChiTietRepository gioHangChiTietRepository;
-    private final SanPhamRepository sanPhamRepository;
-    private final NguoiDungRepository nguoiDungRepository;
+    @Autowired
+    private GioHangRepository gioHangRepository;
 
-    public GioHang getOrCreateGioHang(Long userId) {
-        Optional<GioHang> gioHangOpt = gioHangRepository.findByNguoiDungId(userId);
+    @Autowired
+    private GioHangChiTietRepository gioHangChiTietRepository;
 
-        if (gioHangOpt.isPresent()) {
-            return gioHangOpt.get();
-        } else {
-            NguoiDung nguoiDung = nguoiDungRepository.findById(userId)
-                    .orElseThrow(() -> new RuntimeException("Người dùng không tồn tại"));
-
-            GioHang gioHang = new GioHang();
-            gioHang.setNguoiDung(nguoiDung);
-            return gioHangRepository.save(gioHang);
-        }
+    // Lấy hoặc tạo giỏ hàng cho user
+    public GioHang layHoacTaoGioHang(Integer nguoiDungId) {
+        return gioHangRepository.findByNguoiDungId(nguoiDungId)
+                .orElseGet(() -> {
+                    GioHang gioHang = new GioHang();
+                    gioHang.setNguoiDungId(nguoiDungId);
+                    return gioHangRepository.save(gioHang);
+                });
     }
 
+    // Thêm sản phẩm vào giỏ
     @Transactional
-    public void addToCart(Long userId, Long sanPhamId, Integer soLuong) {
-        GioHang gioHang = getOrCreateGioHang(userId);
-        SanPham sanPham = sanPhamRepository.findById(sanPhamId)
-                .orElseThrow(() -> new RuntimeException("Sản phẩm không tồn tại"));
+    public void themSanPham(Integer nguoiDungId, Integer sanPhamId, Integer soLuong) {
+        GioHang gioHang = layHoacTaoGioHang(nguoiDungId);
 
-        Optional<GioHangChiTiet> existingItem = gioHangChiTietRepository
-                .findByGioHangIdAndSanPhamId(gioHang.getId(), sanPhamId);
+        // Kiểm tra sản phẩm đã có trong giỏ chưa
+        gioHangChiTietRepository.findByGioHangIdAndSanPhamId(gioHang.getId(), sanPhamId)
+                .ifPresentOrElse(
+                        // Nếu có rồi thì cộng thêm số lượng
+                        chiTiet -> {
+                            chiTiet.setSoLuong(chiTiet.getSoLuong() + soLuong);
+                            gioHangChiTietRepository.save(chiTiet);
+                        },
+                        // Nếu chưa có thì tạo mới
+                        () -> {
+                            GioHangChiTiet chiTiet = new GioHangChiTiet();
+                            chiTiet.setGioHangId(gioHang.getId());
+                            chiTiet.setSanPhamId(sanPhamId);
+                            chiTiet.setSoLuong(soLuong);
+                            gioHangChiTietRepository.save(chiTiet);
+                        }
+                );
 
-        if (existingItem.isPresent()) {
-            GioHangChiTiet item = existingItem.get();
-            item.setSoLuong(item.getSoLuong() + soLuong);
-            gioHangChiTietRepository.save(item);
-        } else {
-            GioHangChiTiet newItem = new GioHangChiTiet();
-            newItem.setGioHang(gioHang);
-            newItem.setSanPham(sanPham);
-            newItem.setSoLuong(soLuong);
-            gioHangChiTietRepository.save(newItem);
-        }
+        // Cập nhật thời gian
+        gioHang.setNgayCapNhat(LocalDateTime.now());
+        gioHangRepository.save(gioHang);
     }
 
+    // Lấy danh sách sản phẩm trong giỏ
+    public List<GioHangChiTiet> layDanhSachSanPham(Integer nguoiDungId) {
+        GioHang gioHang = layHoacTaoGioHang(nguoiDungId);
+        return gioHangChiTietRepository.findByGioHangId(gioHang.getId());
+    }
+
+    // Cập nhật số lượng
     @Transactional
-    public void removeFromCart(Long userId, Long itemId) {
-        GioHang gioHang = getOrCreateGioHang(userId);
-        gioHangChiTietRepository.deleteByIdAndGioHangId(itemId, gioHang.getId());
+    public void capNhatSoLuong(Integer chiTietId, Integer soLuong) {
+        gioHangChiTietRepository.findById(chiTietId).ifPresent(chiTiet -> {
+            if (soLuong > 0) {
+                chiTiet.setSoLuong(soLuong);
+                gioHangChiTietRepository.save(chiTiet);
+            } else {
+                gioHangChiTietRepository.delete(chiTiet);
+            }
+        });
     }
 
-    public Double calculateTotal(Long userId) {
-        GioHang gioHang = getOrCreateGioHang(userId);
-        return gioHangChiTietRepository.calculateTotalByGioHangId(gioHang.getId());
+    // Xóa sản phẩm khỏi giỏ
+    @Transactional
+    public void xoaSanPham(Integer chiTietId) {
+        gioHangChiTietRepository.deleteById(chiTietId);
+    }
+
+    // Xóa toàn bộ giỏ hàng
+    @Transactional
+    public void xoaToanBoGioHang(Integer nguoiDungId) {
+        GioHang gioHang = layHoacTaoGioHang(nguoiDungId);
+        gioHangChiTietRepository.deleteByGioHangId(gioHang.getId());
+    }
+
+    // Đếm số sản phẩm trong giỏ
+    public int demSoLuongSanPham(Integer nguoiDungId) {
+        return layDanhSachSanPham(nguoiDungId).stream()
+                .mapToInt(GioHangChiTiet::getSoLuong)
+                .sum();
+    }
+
+    // Tính tổng tiền giỏ hàng
+    public Double tinhTongTien(Integer nguoiDungId) {
+        return layDanhSachSanPham(nguoiDungId).stream()
+                .mapToDouble(GioHangChiTiet::getTongTien)
+                .sum();
+    }
+
+    // Lấy ID người dùng từ Authentication
+    public Integer layNguoiDungId(Authentication authentication) {
+        if (authentication != null && authentication.getPrincipal() instanceof CustomUserDetails) {
+            CustomUserDetails userDetails = (CustomUserDetails) authentication.getPrincipal();
+            return userDetails.getNguoiDung().getId();
+        }
+        return null;
     }
 }
