@@ -1,0 +1,515 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Thanh toán</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #f5f5f5;
+        }
+
+        .header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 10px 0;
+        }
+
+        .header-main {
+            max-width: 1200px;
+            margin: 15px auto;
+            padding: 0 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .logo {
+            font-size: 28px;
+            font-weight: bold;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            color: white;
+            text-decoration: none;
+        }
+
+        .breadcrumb {
+            background: white;
+            padding: 15px 0;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+        }
+
+        .breadcrumb-content {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 20px;
+            display: flex;
+            gap: 10px;
+            font-size: 14px;
+            color: #666;
+        }
+
+        .breadcrumb a {
+            color: #667eea;
+            text-decoration: none;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 30px auto;
+            padding: 0 20px;
+            display: grid;
+            grid-template-columns: 1fr 400px;
+            gap: 30px;
+        }
+
+        .checkout-form {
+            background: white;
+            border-radius: 10px;
+            padding: 30px;
+        }
+
+        .form-title {
+            font-size: 24px;
+            font-weight: bold;
+            margin-bottom: 25px;
+            color: #333;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .form-section {
+            margin-bottom: 30px;
+        }
+
+        .section-title {
+            font-size: 16px;
+            font-weight: 600;
+            color: #667eea;
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 500;
+            color: #333;
+            font-size: 14px;
+        }
+
+        .form-group label .required {
+            color: #ff6b6b;
+        }
+
+        .form-group input,
+        .form-group textarea {
+            width: 100%;
+            padding: 12px 15px;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            font-size: 14px;
+            transition: border-color 0.3s;
+        }
+
+        .form-group input:focus,
+        .form-group textarea:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+
+        .form-group textarea {
+            resize: vertical;
+            min-height: 80px;
+        }
+
+        .payment-methods {
+            display: grid;
+            gap: 15px;
+        }
+
+        .payment-option {
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            padding: 15px;
+            cursor: pointer;
+            transition: all 0.3s;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .payment-option:hover {
+            border-color: #667eea;
+            background-color: #f8f9fa;
+        }
+
+        .payment-option input[type="radio"] {
+            width: 20px;
+            height: 20px;
+            cursor: pointer;
+        }
+
+        .payment-option.selected {
+            border-color: #667eea;
+            background-color: #f0f4ff;
+        }
+
+        .payment-icon {
+            font-size: 24px;
+            color: #667eea;
+        }
+
+        .payment-info {
+            flex: 1;
+        }
+
+        .payment-info .title {
+            font-weight: 600;
+            color: #333;
+            margin-bottom: 4px;
+        }
+
+        .payment-info .desc {
+            font-size: 13px;
+            color: #666;
+        }
+
+        /* Order Summary */
+        .order-summary {
+            background: white;
+            border-radius: 10px;
+            padding: 25px;
+            height: fit-content;
+            position: sticky;
+            top: 20px;
+        }
+
+        .summary-title {
+            font-size: 20px;
+            font-weight: bold;
+            margin-bottom: 20px;
+            color: #333;
+        }
+
+        .summary-items {
+            max-height: 300px;
+            overflow-y: auto;
+            margin-bottom: 20px;
+        }
+
+        .summary-item {
+            display: flex;
+            gap: 15px;
+            padding: 15px 0;
+            border-bottom: 1px solid #f0f0f0;
+        }
+
+        .summary-item:last-child {
+            border-bottom: none;
+        }
+
+        .item-image {
+            width: 60px;
+            height: 80px;
+            background: #f8f9fa;
+            border-radius: 5px;
+            overflow: hidden;
+            flex-shrink: 0;
+        }
+
+        .item-image img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .item-image.no-image {
+            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .item-image i {
+            font-size: 28px;
+            color: #667eea;
+        }
+
+        .item-details {
+            flex: 1;
+        }
+
+        .item-name {
+            font-size: 14px;
+            color: #333;
+            margin-bottom: 5px;
+            display: -webkit-box;
+            -webkit-line-clamp: 2;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+        }
+
+        .item-quantity {
+            font-size: 13px;
+            color: #666;
+        }
+
+        .item-price {
+            font-weight: 600;
+            color: #ff6b6b;
+        }
+
+        .summary-row {
+            display: flex;
+            justify-content: space-between;
+            padding: 12px 0;
+            font-size: 15px;
+            color: #666;
+        }
+
+        .summary-row.total {
+            border-top: 2px solid #e0e0e0;
+            margin-top: 10px;
+            padding-top: 15px;
+            font-size: 18px;
+            font-weight: bold;
+            color: #333;
+        }
+
+        .summary-row.total .amount {
+            color: #ff6b6b;
+        }
+
+        .submit-btn {
+            width: 100%;
+            padding: 15px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            margin-top: 20px;
+            transition: opacity 0.3s;
+        }
+
+        .submit-btn:hover {
+            opacity: 0.9;
+        }
+
+        .back-link {
+            display: block;
+            text-align: center;
+            margin-top: 15px;
+            color: #667eea;
+            text-decoration: none;
+            font-size: 14px;
+        }
+
+        .alert {
+            padding: 15px 20px;
+            background: #ffebee;
+            color: #c62828;
+            border: 1px solid #ef9a9a;
+            border-radius: 8px;
+            margin-bottom: 20px;
+        }
+    </style>
+</head>
+<body>
+<header class="header">
+    <div class="header-main">
+        <a href="/client/home" class="logo">
+            <i class="fas fa-book-open"></i>
+            <span>BookStore</span>
+        </a>
+    </div>
+</header>
+
+<div class="breadcrumb">
+    <div class="breadcrumb-content">
+        <a href="/client/home"><i class="fas fa-home"></i> Trang chủ</a>
+        <span>/</span>
+        <a href="/client/gio-hang">Giỏ hàng</a>
+        <span>/</span>
+        <span>Thanh toán</span>
+    </div>
+</div>
+
+<div class="container">
+    <!-- Checkout Form -->
+    <div class="checkout-form">
+        <h1 class="form-title">
+            <i class="fas fa-credit-card"></i>
+            Thông tin thanh toán
+        </h1>
+
+        <div class="alert" th:if="${error}">
+            <i class="fas fa-exclamation-circle"></i>
+            <span th:text="${error}">Lỗi</span>
+        </div>
+
+        <form th:action="@{/client/thanh-toan/xu-ly}" method="post">
+            <!-- Thông tin người nhận -->
+            <div class="form-section">
+                <div class="section-title">
+                    <i class="fas fa-user"></i>
+                    Thông tin người nhận
+                </div>
+
+                <div class="form-group">
+                    <label>Họ và tên <span class="required">*</span></label>
+                    <input type="text" name="hoTen" required
+                           placeholder="Nhập họ tên người nhận">
+                </div>
+
+                <div class="form-group">
+                    <label>Số điện thoại <span class="required">*</span></label>
+                    <input type="tel" name="sdt" required
+                           placeholder="Nhập số điện thoại">
+                </div>
+
+                <div class="form-group">
+                    <label>Địa chỉ giao hàng <span class="required">*</span></label>
+                    <textarea name="diaChi" required
+                              placeholder="Nhập địa chỉ chi tiết (số nhà, đường, phường/xã, quận/huyện, tỉnh/thành phố)"></textarea>
+                </div>
+            </div>
+
+            <!-- Phương thức thanh toán -->
+            <div class="form-section">
+                <div class="section-title">
+                    <i class="fas fa-wallet"></i>
+                    Phương thức thanh toán
+                </div>
+
+                <div class="payment-methods">
+                    <label class="payment-option">
+                        <input type="radio" name="phuongThucThanhToan" value="Tiền mặt" checked>
+                        <i class="fas fa-money-bill-wave payment-icon"></i>
+                        <div class="payment-info">
+                            <div class="title">Thanh toán khi nhận hàng (COD)</div>
+                            <div class="desc">Thanh toán bằng tiền mặt khi nhận hàng</div>
+                        </div>
+                    </label>
+
+                    <label class="payment-option">
+                        <input type="radio" name="phuongThucThanhToan" value="Chuyển khoản">
+                        <i class="fas fa-university payment-icon"></i>
+                        <div class="payment-info">
+                            <div class="title">Chuyển khoản ngân hàng</div>
+                            <div class="desc">Chuyển khoản trước khi nhận hàng</div>
+                        </div>
+                    </label>
+
+                    <label class="payment-option">
+                        <input type="radio" name="phuongThucThanhToan" value="Ví điện tử">
+                        <i class="fas fa-mobile-alt payment-icon"></i>
+                        <div class="payment-info">
+                            <div class="title">Ví điện tử (MoMo, ZaloPay)</div>
+                            <div class="desc">Thanh toán qua ví điện tử</div>
+                        </div>
+                    </label>
+                </div>
+            </div>
+
+            <!-- Ghi chú -->
+            <div class="form-section">
+                <div class="section-title">
+                    <i class="fas fa-sticky-note"></i>
+                    Ghi chú đơn hàng (không bắt buộc)
+                </div>
+
+                <div class="form-group">
+                        <textarea name="ghiChu"
+                                  placeholder="Ghi chú về đơn hàng, ví dụ: thời gian hay chỉ dẫn địa điểm giao hàng chi tiết hơn."></textarea>
+                </div>
+            </div>
+
+            <button type="submit" class="submit-btn">
+                <i class="fas fa-check"></i> Hoàn tất đặt hàng
+            </button>
+
+            <a href="/client/gio-hang" class="back-link">
+                <i class="fas fa-arrow-left"></i> Quay lại giỏ hàng
+            </a>
+        </form>
+    </div>
+
+    <!-- Order Summary -->
+    <div class="order-summary">
+        <h2 class="summary-title">Đơn hàng của bạn</h2>
+
+        <div class="summary-items">
+            <div class="summary-item" th:each="item : ${danhSachSanPham}">
+                <div class="item-image"
+                     th:classappend="${item.sanPham.anhDaiDien == null or item.sanPham.anhDaiDien.isEmpty()} ? 'no-image' : ''">
+                    <img th:if="${item.sanPham.anhDaiDien != null and !item.sanPham.anhDaiDien.isEmpty()}"
+                         th:src="${item.sanPham.anhDaiDien}"
+                         th:alt="${item.sanPham.ten}">
+                    <i th:if="${item.sanPham.anhDaiDien == null or item.sanPham.anhDaiDien.isEmpty()}"
+                       class="fas fa-book"></i>
+                </div>
+                <div class="item-details">
+                    <div class="item-name" th:text="${item.sanPham.ten}">Tên sách</div>
+                    <div class="item-quantity">
+                        Số lượng: <span th:text="${item.soLuong}">1</span>
+                    </div>
+                    <div class="item-price" th:text="${#numbers.formatDecimal(item.tongTien, 0, 'COMMA', 0, 'POINT')} + '₫'">
+                        27,000₫
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="summary-row">
+            <span>Tạm tính:</span>
+            <span class="amount" th:text="${#numbers.formatDecimal(tongTien, 0, 'COMMA', 0, 'POINT')} + '₫'">0₫</span>
+        </div>
+
+        <div class="summary-row">
+            <span>Phí vận chuyển:</span>
+            <span class="amount">Miễn phí</span>
+        </div>
+
+        <div class="summary-row total">
+            <span>Tổng cộng:</span>
+            <span class="amount" th:text="${#numbers.formatDecimal(tongTien, 0, 'COMMA', 0, 'POINT')} + '₫'">0₫</span>
+        </div>
+    </div>
+</div>
+
+<script>
+    // Xử lý chọn phương thức thanh toán
+    document.querySelectorAll('.payment-option').forEach(option => {
+        option.addEventListener('click', function() {
+            document.querySelectorAll('.payment-option').forEach(opt => {
+                opt.classList.remove('selected');
+            });
+            this.classList.add('selected');
+        });
+    });
+
+    // Set selected cho option đầu tiên
+    document.querySelector('.payment-option').classList.add('selected');
+</script>
+</body>
+</html>

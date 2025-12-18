@@ -1,24 +1,36 @@
 package com.nvkproject3.model;
 
 import jakarta.persistence.*;
+import lombok.Data;
+import java.util.HashSet;
+import java.util.Set;
 
 @Entity
 @Table(name = "san_pham")
+@Data
 public class SanPham {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
 
+    @Column(nullable = false)
     private String ten;
 
     @Column(name = "ma_sku", unique = true)
     private String maSku;
 
+    @Column(columnDefinition = "TEXT")
+    private String moTa;
+
+    @Column(nullable = false)
     private Double gia;
 
     @Column(name = "so_luong_ton")
     private Integer soLuongTon = 0;
+
+    @Column(name = "anh_dai_dien")
+    private String anhDaiDien;
 
     @Column(name = "nha_xuat_ban")
     private String nhaXuatBan;
@@ -35,109 +47,39 @@ public class SanPham {
     @Column(name = "ngon_ngu")
     private String ngonNgu;
 
-    @Column(columnDefinition = "TEXT")
-    private String moTa;
+    // KHÔNG CÓ: ngayTao, ngayCapNhat, trangThai trong database gốc
+    // Nếu muốn thêm, phải ALTER TABLE trước
 
-    @Column(name = "anh_dai_dien")
-    private String anhDaiDien;
+    // Many-to-Many với DanhMuc qua bảng trung gian
+    @ManyToMany(fetch = FetchType.LAZY)
+    @JoinTable(
+            name = "san_pham_danh_muc",
+            joinColumns = @JoinColumn(name = "san_pham_id"),
+            inverseJoinColumns = @JoinColumn(name = "danh_muc_id")
+    )
+    private Set<DanhMuc> danhMucs = new HashSet<>();
 
-    // Constructors
-    public SanPham() {}
-
-    // Getters and Setters
-    public Integer getId() {
-        return id;
+    // Transient field - không map vào database
+    // Dùng để hiển thị trạng thái trong code
+    @Transient
+    public String getTrangThaiDisplay() {
+        if (soLuongTon == null || soLuongTon <= 0) {
+            return "Hết hàng";
+        } else if (soLuongTon <= 5) {
+            return "Sắp hết";
+        } else {
+            return "Còn hàng";
+        }
     }
 
-    public void setId(Integer id) {
-        this.id = id;
+    // Helper methods
+    public void themDanhMuc(DanhMuc danhMuc) {
+        this.danhMucs.add(danhMuc);
+        danhMuc.getSanPhams().add(this);
     }
 
-    public String getTen() {
-        return ten;
-    }
-
-    public void setTen(String ten) {
-        this.ten = ten;
-    }
-
-    public String getMaSku() {
-        return maSku;
-    }
-
-    public void setMaSku(String maSku) {
-        this.maSku = maSku;
-    }
-
-    public Double getGia() {
-        return gia;
-    }
-
-    public void setGia(Double gia) {
-        this.gia = gia;
-    }
-
-    public Integer getSoLuongTon() {
-        return soLuongTon;
-    }
-
-    public void setSoLuongTon(Integer soLuongTon) {
-        this.soLuongTon = soLuongTon;
-    }
-
-    public String getNhaXuatBan() {
-        return nhaXuatBan;
-    }
-
-    public void setNhaXuatBan(String nhaXuatBan) {
-        this.nhaXuatBan = nhaXuatBan;
-    }
-
-    public Integer getNamXuatBan() {
-        return namXuatBan;
-    }
-
-    public void setNamXuatBan(Integer namXuatBan) {
-        this.namXuatBan = namXuatBan;
-    }
-
-    public Integer getSoTrang() {
-        return soTrang;
-    }
-
-    public void setSoTrang(Integer soTrang) {
-        this.soTrang = soTrang;
-    }
-
-    public Double getTrongLuong() {
-        return trongLuong;
-    }
-
-    public void setTrongLuong(Double trongLuong) {
-        this.trongLuong = trongLuong;
-    }
-
-    public String getNgonNgu() {
-        return ngonNgu;
-    }
-
-    public void setNgonNgu(String ngonNgu) {
-        this.ngonNgu = ngonNgu;
-    }
-
-    public String getMoTa() {
-        return moTa;
-    }
-
-    public void setMoTa(String moTa) {
-        this.moTa = moTa;
-    }
-
-    public String getAnhDaiDien() {
-        return anhDaiDien;
-    }
-
-    public void setAnhDaiDien(String anhDaiDien) {
-        this.anhDaiDien = anhDaiDien;
+    public void xoaDanhMuc(DanhMuc danhMuc) {
+        this.danhMucs.remove(danhMuc);
+        danhMuc.getSanPhams().remove(this);
     }
 }

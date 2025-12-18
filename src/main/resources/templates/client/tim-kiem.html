@@ -1,0 +1,385 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tìm kiếm sản phẩm</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #f5f5f5;
+        }
+
+        .header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 10px 0;
+        }
+
+        .header-main {
+            max-width: 1200px;
+            margin: 15px auto;
+            padding: 0 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .logo {
+            font-size: 28px;
+            font-weight: bold;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            color: white;
+            text-decoration: none;
+        }
+
+        .search-box {
+            flex: 1;
+            max-width: 500px;
+            margin: 0 30px;
+        }
+
+        .search-box form {
+            display: flex;
+        }
+
+        .search-box input {
+            flex: 1;
+            padding: 12px 15px;
+            border: none;
+            border-radius: 5px 0 0 5px;
+            font-size: 14px;
+        }
+
+        .search-box button {
+            padding: 12px 20px;
+            background-color: #ff6b6b;
+            color: white;
+            border: none;
+            border-radius: 0 5px 5px 0;
+            cursor: pointer;
+        }
+
+        .header-icons {
+            display: flex;
+            gap: 25px;
+            align-items: center;
+        }
+
+        .header-icons a {
+            color: white;
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+
+        .cart-icon {
+            position: relative;
+        }
+
+        .cart-count {
+            position: absolute;
+            top: -8px;
+            right: -8px;
+            background-color: #ff6b6b;
+            color: white;
+            border-radius: 50%;
+            min-width: 18px;
+            height: 18px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 11px;
+            padding: 0 4px;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 30px auto;
+            padding: 0 20px;
+        }
+
+        .search-result-header {
+            background: white;
+            padding: 25px 30px;
+            border-radius: 10px;
+            margin-bottom: 30px;
+        }
+
+        .search-result-header h1 {
+            font-size: 28px;
+            color: #333;
+            margin-bottom: 10px;
+        }
+
+        .search-info {
+            color: #666;
+            font-size: 15px;
+        }
+
+        .product-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+
+        .product-card {
+            background: white;
+            border-radius: 10px;
+            overflow: hidden;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+            transition: transform 0.3s, box-shadow 0.3s;
+            cursor: pointer;
+        }
+
+        .product-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+        }
+
+        .product-image {
+            width: 100%;
+            height: 280px;
+            background-color: #f8f9fa;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .product-image img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .product-image.no-image {
+            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+        }
+
+        .product-image.no-image i {
+            font-size: 64px;
+            color: #667eea;
+        }
+
+        .sale-badge {
+            position: absolute;
+            top: 10px;
+            left: 10px;
+            background-color: #ff6b6b;
+            color: white;
+            padding: 5px 10px;
+            border-radius: 5px;
+            font-size: 12px;
+            font-weight: bold;
+        }
+
+        .product-info {
+            padding: 15px;
+        }
+
+        .product-name {
+            font-size: 15px;
+            color: #333;
+            margin-bottom: 8px;
+            display: -webkit-box;
+            -webkit-line-clamp: 2;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+            min-height: 42px;
+        }
+
+        .product-price {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 10px;
+        }
+
+        .price-current {
+            font-size: 18px;
+            font-weight: bold;
+            color: #ff6b6b;
+        }
+
+        .price-old {
+            font-size: 14px;
+            color: #999;
+            text-decoration: line-through;
+        }
+
+        .add-to-cart-btn {
+            width: 100%;
+            padding: 10px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: 500;
+        }
+
+        .pagination {
+            display: flex;
+            justify-content: center;
+            gap: 10px;
+            margin-top: 30px;
+        }
+
+        .pagination a {
+            padding: 10px 15px;
+            background: white;
+            color: #667eea;
+            text-decoration: none;
+            border-radius: 5px;
+            border: 2px solid #667eea;
+        }
+
+        .pagination a.active {
+            background: #667eea;
+            color: white;
+        }
+
+        .empty-state {
+            background: white;
+            border-radius: 10px;
+            padding: 60px 20px;
+            text-align: center;
+        }
+
+        .empty-state i {
+            font-size: 80px;
+            color: #ccc;
+            margin-bottom: 20px;
+        }
+    </style>
+    <link rel="stylesheet" href="/css/notification.css">
+</head>
+<body>
+<header class="header">
+    <div class="header-main">
+        <a href="/client/home" class="logo">
+            <i class="fas fa-book-open"></i>
+            <span>BookStore</span>
+        </a>
+
+        <div class="search-box">
+            <form th:action="@{/client/tim-kiem}" method="get">
+                <input type="text" name="keyword" th:value="${keyword}" placeholder="Tìm kiếm sách...">
+                <button type="submit">
+                    <i class="fas fa-search"></i> Tìm kiếm
+                </button>
+            </form>
+        </div>
+
+        <div class="header-icons">
+            <a href="/client/don-hang" style="position: relative;">
+                <i class="fas fa-clipboard-list"></i>
+                <span>Đơn hàng</span>
+                <span class="cart-count" th:if="${soDonHangCho > 0}" th:text="${soDonHangCho}">0</span>
+            </a>
+            <a href="/client/gio-hang" class="cart-icon">
+                <i class="fas fa-shopping-cart"></i>
+                <span>Giỏ hàng</span>
+                <span class="cart-count" th:text="${soLuongGioHang != null ? soLuongGioHang : 0}">0</span>
+            </a>
+            <a href="/logout">
+                <i class="fas fa-sign-out-alt"></i>
+            </a>
+        </div>
+    </div>
+</header>
+
+<div class="container">
+    <div class="search-result-header">
+        <h1>
+            <i class="fas fa-search"></i>
+            Kết quả tìm kiếm
+        </h1>
+        <div class="search-info">
+                <span th:if="${keyword != null and !keyword.isEmpty()}">
+                    Tìm thấy <strong th:text="${sanPhamPage != null ? sanPhamPage.totalElements : 0}">0</strong>
+                    sản phẩm cho từ khóa "<strong th:text="${keyword}">...</strong>"
+                </span>
+            <span th:if="${keyword == null or keyword.isEmpty()}">
+                    Vui lòng nhập từ khóa để tìm kiếm
+                </span>
+        </div>
+    </div>
+
+    <div class="product-grid" th:if="${sanPhamPage != null and !sanPhamPage.isEmpty()}">
+        <div class="product-card" th:each="sp : ${sanPhamPage.content}"
+             th:onclick="'location.href=\'/client/san-pham/' + ${sp.id} + '\''">
+            <div class="product-image"
+                 th:classappend="${sp.anhDaiDien == null or sp.anhDaiDien.isEmpty()} ? 'no-image' : ''">
+                <img th:if="${sp.anhDaiDien != null and !sp.anhDaiDien.isEmpty()}"
+                     th:src="${sp.anhDaiDien}"
+                     th:alt="${sp.ten}">
+                <i th:if="${sp.anhDaiDien == null or sp.anhDaiDien.isEmpty()}"
+                   class="fas fa-book"></i>
+                <span class="sale-badge">-10%</span>
+            </div>
+            <div class="product-info">
+                <h3 class="product-name" th:text="${sp.ten}">Tên sách</h3>
+                <div class="product-price">
+                    <span class="price-current" th:text="${#numbers.formatDecimal(sp.gia * 0.9, 0, 'COMMA', 0, 'POINT')} + '₫'">100,000₫</span>
+                    <span class="price-old" th:text="${#numbers.formatDecimal(sp.gia, 0, 'COMMA', 0, 'POINT')} + '₫'">120,000₫</span>
+                </div>
+                <form th:action="@{/client/gio-hang/them}" method="post" style="margin: 0;" onclick="event.stopPropagation();">
+                    <input type="hidden" name="sanPhamId" th:value="${sp.id}">
+                    <input type="hidden" name="soLuong" value="1">
+                    <button type="submit" class="add-to-cart-btn">
+                        <i class="fas fa-cart-plus"></i> Thêm vào giỏ
+                    </button>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- Pagination -->
+    <div class="pagination" th:if="${sanPhamPage != null and sanPhamPage.totalPages > 1}">
+        <a th:if="${sanPhamPage.number > 0}"
+           th:href="@{/client/tim-kiem(keyword=${keyword}, page=${sanPhamPage.number - 1})}">
+            <i class="fas fa-chevron-left"></i> Trước
+        </a>
+
+        <a th:each="i : ${#numbers.sequence(0, sanPhamPage.totalPages - 1)}"
+           th:href="@{/client/tim-kiem(keyword=${keyword}, page=${i})}"
+           th:text="${i + 1}"
+           th:classappend="${i == sanPhamPage.number} ? 'active' : ''">
+            1
+        </a>
+
+        <a th:if="${sanPhamPage.number < sanPhamPage.totalPages - 1}"
+           th:href="@{/client/tim-kiem(keyword=${keyword}, page=${sanPhamPage.number + 1})}">
+            Sau <i class="fas fa-chevron-right"></i>
+        </a>
+    </div>
+
+    <div class="empty-state" th:if="${sanPhamPage == null or sanPhamPage.isEmpty()}">
+        <i class="fas fa-search"></i>
+        <h2>Không tìm thấy sản phẩm</h2>
+        <p th:if="${keyword != null and !keyword.isEmpty()}">
+            Không tìm thấy sản phẩm nào với từ khóa "<strong th:text="${keyword}"></strong>"
+        </p>
+        <p th:if="${keyword == null or keyword.isEmpty()}">
+            Vui lòng nhập từ khóa để tìm kiếm sản phẩm
+        </p>
+    </div>
+</div>
+<script src="/js/cart.js"></script>
+</body>
+</html>

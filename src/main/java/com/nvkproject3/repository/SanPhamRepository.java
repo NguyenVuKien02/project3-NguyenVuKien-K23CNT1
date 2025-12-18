@@ -43,4 +43,11 @@ public interface SanPhamRepository extends JpaRepository<SanPham, Integer> {
     // Tìm sản phẩm theo tác giả (join với bảng trung gian)
     @Query("SELECT s FROM SanPham s JOIN SanPhamTacGia stg ON s.id = stg.sanPhamId WHERE stg.tacGiaId = :tacGiaId")
     List<SanPham> findByTacGiaId(@Param("tacGiaId") Integer tacGiaId);
+
+    // Lấy sản phẩm theo nhiều danh mục (danh mục cha + các danh mục con)
+    @Query("SELECT DISTINCT sp FROM SanPham sp " +
+            "JOIN SanPhamDanhMuc spdm ON sp.id = spdm.sanPhamId " +
+            "WHERE spdm.danhMucId IN :danhMucIds")
+    List<SanPham> findByDanhMucIdIn(@Param("danhMucIds") List<Integer> danhMucIds);
+
 }

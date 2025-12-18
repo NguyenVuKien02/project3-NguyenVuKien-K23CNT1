@@ -1,9 +1,13 @@
 package com.nvkproject3.model;
 
 import jakarta.persistence.*;
+import lombok.Data;
+import java.util.HashSet;
+import java.util.Set;
 
 @Entity
 @Table(name = "danh_muc")
+@Data
 public class DanhMuc {
 
     @Id
@@ -11,7 +15,7 @@ public class DanhMuc {
     private Integer id;
 
     @Column(name = "ten_danh_muc", nullable = false)
-    private String tenDanhMuc;
+    private String ten;
 
     @Column(name = "danh_muc_cha_id")
     private Integer danhMucChaId;
@@ -19,39 +23,15 @@ public class DanhMuc {
     @Column(columnDefinition = "TEXT")
     private String moTa;
 
-    // Constructors
-    public DanhMuc() {}
+    // Self-referencing relationship
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "danh_muc_cha_id", insertable = false, updatable = false)
+    private DanhMuc danhMucCha;
 
-    // Getters and Setters
-    public Integer getId() {
-        return id;
-    }
+    @OneToMany(mappedBy = "danhMucCha", fetch = FetchType.LAZY)
+    private Set<DanhMuc> danhMucCons = new HashSet<>();
 
-    public void setId(Integer id) {
-        this.id = id;
-    }
-
-    public String getTenDanhMuc() {
-        return tenDanhMuc;
-    }
-
-    public void setTenDanhMuc(String tenDanhMuc) {
-        this.tenDanhMuc = tenDanhMuc;
-    }
-
-    public Integer getDanhMucChaId() {
-        return danhMucChaId;
-    }
-
-    public void setDanhMucChaId(Integer danhMucChaId) {
-        this.danhMucChaId = danhMucChaId;
-    }
-
-    public String getMoTa() {
-        return moTa;
-    }
-
-    public void setMoTa(String moTa) {
-        this.moTa = moTa;
-    }
+    // Many-to-Many với SanPham
+    @ManyToMany(mappedBy = "danhMucs", fetch = FetchType.LAZY)
+    private Set<SanPham> sanPhams = new HashSet<>();
 }

@@ -1,0 +1,194 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head th:replace="admin/admin-layout :: head('Quản lý sản phẩm')"></head>
+<body>
+<!-- Sidebar -->
+<aside th:replace="admin/admin-layout :: sidebar('san-pham')"></aside>
+
+<!-- Main Content -->
+<main class="main-content">
+    <!-- Header -->
+    <div th:replace="admin/admin-layout :: header('Quản lý sản phẩm', 'fas fa-box')"></div>
+
+    <!-- Alert Messages -->
+    <div class="alert alert-success" th:if="${message}">
+        <i class="fas fa-check-circle"></i>
+        <span th:text="${message}">Thông báo</span>
+    </div>
+
+    <div class="alert alert-error" th:if="${error}">
+        <i class="fas fa-exclamation-circle"></i>
+        <span th:text="${error}">Lỗi</span>
+    </div>
+
+    <!-- Content Section -->
+    <div class="content-section">
+        <div class="section-header">
+            <h2 class="section-title">
+                <i class="fas fa-list"></i>
+                Danh sách sản phẩm
+            </h2>
+            <a href="/admin/san-pham/them" class="btn btn-primary">
+                <i class="fas fa-plus"></i> Thêm sản phẩm
+            </a>
+        </div>
+
+        <!-- Search Bar -->
+        <div style="margin-bottom: 20px;">
+            <form th:action="@{/admin/san-pham}" method="get" style="display: flex; gap: 10px; max-width: 500px;">
+                <input type="text" name="keyword" th:value="${keyword}"
+                       placeholder="Tìm kiếm sản phẩm..."
+                       style="flex: 1; padding: 10px 15px; border: 1px solid #ddd; border-radius: 6px; font-size: 14px;">
+                <button type="submit" class="btn btn-primary">
+                    <i class="fas fa-search"></i> Tìm kiếm
+                </button>
+                <a href="/admin/san-pham" class="btn btn-secondary" th:if="${keyword}">
+                    <i class="fas fa-times"></i> Xóa
+                </a>
+            </form>
+        </div>
+
+        <!-- Stats -->
+        <div style="margin-bottom: 20px; padding: 15px; background: #f8f9fa; border-radius: 6px; display: flex; gap: 30px;">
+            <div>
+                <strong>Tổng sản phẩm:</strong>
+                <span th:text="${sanPhamPage.totalElements}">0</span>
+            </div>
+            <div>
+                <strong>Trang:</strong>
+                <span th:text="${sanPhamPage.number + 1}">1</span> /
+                <span th:text="${sanPhamPage.totalPages}">1</span>
+            </div>
+        </div>
+
+        <!-- Table -->
+        <table class="data-table" th:if="${sanPhamPage.content != null and !sanPhamPage.content.isEmpty()}">
+            <thead>
+            <tr>
+                <th>ID</th>
+                <th>Hình ảnh</th>
+                <th>Tên sản phẩm</th>
+                <th>Danh mục</th>
+                <th>Giá</th>
+                <th>Tồn kho</th>
+                <th>Trạng thái</th>
+                <th>Thao tác</th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr th:each="sp : ${sanPhamPage.content}">
+                <td><strong th:text="${sp.id}">1</strong></td>
+                <td>
+                    <img th:if="${sp.anhDaiDien != null and !sp.anhDaiDien.isEmpty()}"
+                         th:src="${sp.anhDaiDien}"
+                         alt="Product"
+                         style="width: 50px; height: 60px; object-fit: cover; border-radius: 4px;">
+                    <div th:if="${sp.anhDaiDien == null or sp.anhDaiDien.isEmpty()}"
+                         style="width: 50px; height: 60px; background: #f0f0f0; border-radius: 4px; display: flex; align-items: center; justify-content: center;">
+                        <i class="fas fa-image" style="color: #ccc;"></i>
+                    </div>
+                </td>
+                <td>
+                    <strong th:text="${sp.ten}">Tên sản phẩm</strong>
+                    <div style="font-size: 12px; color: #999;" th:if="${sp.maSku != null}">
+                        <i class="fas fa-barcode"></i>
+                        <span th:text="${sp.maSku}">SKU</span>
+                    </div>
+                </td>
+                <td>
+                    <!-- Hiển thị danh mục từ Set -->
+                    <div th:if="${sp.danhMucs != null and !sp.danhMucs.isEmpty()}">
+                                <span th:each="dm, iterStat : ${sp.danhMucs}"
+                                      class="status-badge badge-info"
+                                      style="font-size: 11px; margin: 2px;">
+                                    <span th:text="${dm.ten}">Danh mục</span>
+                                </span>
+                    </div>
+                    <span th:if="${sp.danhMucs == null or sp.danhMucs.isEmpty()}" style="color: #999;">
+                                Chưa phân loại
+                            </span>
+                </td>
+                <td>
+                    <strong th:text="${#numbers.formatDecimal(sp.gia, 0, 'COMMA', 0, 'POINT')} + '₫'">
+                        30,000₫
+                    </strong>
+                </td>
+                <td>
+                    <span th:text="${sp.soLuongTon}">10</span>
+                    <span th:if="${sp.soLuongTon <= 5}" style="color: #ff6b6b;">
+                                <i class="fas fa-exclamation-triangle"></i>
+                            </span>
+                </td>
+                <td>
+                    <!-- Hiển thị trạng thái dựa trên số lượng tồn -->
+                    <span class="status-badge"
+                          th:classappend="${sp.soLuongTon > 5 ? 'badge-success' : (sp.soLuongTon > 0 ? 'badge-warning' : 'badge-danger')}"
+                          th:text="${sp.soLuongTon > 5 ? 'Còn hàng' : (sp.soLuongTon > 0 ? 'Sắp hết' : 'Hết hàng')}">
+                                Còn hàng
+                            </span>
+                </td>
+                <td>
+                    <div style="display: flex; gap: 5px;">
+                        <a th:href="@{'/admin/san-pham/' + ${sp.id}}"
+                           class="btn btn-primary"
+                           style="padding: 6px 12px; font-size: 13px;"
+                           title="Xem chi tiết">
+                            <i class="fas fa-eye"></i>
+                        </a>
+                        <a th:href="@{'/admin/san-pham/sua/' + ${sp.id}}"
+                           class="btn btn-warning"
+                           style="padding: 6px 12px; font-size: 13px;"
+                           title="Sửa">
+                            <i class="fas fa-edit"></i>
+                        </a>
+                        <form th:action="@{'/admin/san-pham/xoa/' + ${sp.id}}"
+                              method="post"
+                              style="display: inline;"
+                              onsubmit="return confirm('Bạn có chắc muốn xóa sản phẩm này?')">
+                            <button type="submit"
+                                    class="btn btn-danger"
+                                    style="padding: 6px 12px; font-size: 13px;"
+                                    title="Xóa">
+                                <i class="fas fa-trash"></i>
+                            </button>
+                        </form>
+                    </div>
+                </td>
+            </tr>
+            </tbody>
+        </table>
+
+        <!-- Empty State -->
+        <div class="empty-state" th:if="${sanPhamPage.content == null or sanPhamPage.content.isEmpty()}">
+            <i class="fas fa-box-open"></i>
+            <h3>Chưa có sản phẩm nào</h3>
+            <p th:if="${keyword}">Không tìm thấy sản phẩm với từ khóa "<span th:text="${keyword}"></span>"</p>
+            <p th:if="${!keyword}">Hãy thêm sản phẩm đầu tiên</p>
+            <a href="/admin/san-pham/them" class="btn btn-primary" style="margin-top: 15px;">
+                <i class="fas fa-plus"></i> Thêm sản phẩm
+            </a>
+        </div>
+
+        <!-- Pagination -->
+        <div class="pagination" th:if="${sanPhamPage.totalPages > 1}">
+            <a th:if="${sanPhamPage.number > 0}"
+               th:href="@{/admin/san-pham(page=${sanPhamPage.number - 1}, keyword=${keyword})}">
+                <i class="fas fa-chevron-left"></i> Trước
+            </a>
+
+            <span th:each="i : ${#numbers.sequence(0, sanPhamPage.totalPages - 1)}"
+                  th:if="${i >= sanPhamPage.number - 2 and i <= sanPhamPage.number + 2}">
+                    <a th:href="@{/admin/san-pham(page=${i}, keyword=${keyword})}"
+                       th:classappend="${i == sanPhamPage.number} ? 'active' : ''"
+                       th:text="${i + 1}">1</a>
+                </span>
+
+            <a th:if="${sanPhamPage.number < sanPhamPage.totalPages - 1}"
+               th:href="@{/admin/san-pham(page=${sanPhamPage.number + 1}, keyword=${keyword})}">
+                Sau <i class="fas fa-chevron-right"></i>
+            </a>
+        </div>
+    </div>
+</main>
+</body>
+</html>
