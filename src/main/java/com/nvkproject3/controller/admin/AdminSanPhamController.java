@@ -10,6 +10,7 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Controller;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
@@ -32,6 +33,7 @@ public class AdminSanPhamController {
      * Danh sách sản phẩm với phân trang và tìm kiếm
      */
     @GetMapping
+    @Transactional(readOnly = true)  // QUAN TRỌNG: Thêm @Transactional
     public String danhSach(
             @RequestParam(value = "page", defaultValue = "0") int page,
             @RequestParam(value = "keyword", required = false) String keyword,
@@ -45,6 +47,11 @@ public class AdminSanPhamController {
             model.addAttribute("keyword", keyword);
         } else {
             sanPhamPage = sanPhamRepository.findAll(pageable);
+        }
+
+        // FORCE LOAD danh mục để tránh LazyInitializationException
+        for (SanPham sp : sanPhamPage.getContent()) {
+            sp.getDanhMucs().size(); // Force initialize
         }
 
         model.addAttribute("sanPhamPage", sanPhamPage);
@@ -69,6 +76,7 @@ public class AdminSanPhamController {
      * Xử lý thêm sản phẩm
      */
     @PostMapping("/them")
+    @Transactional
     public String themSanPham(
             @RequestParam String ten,
             @RequestParam(required = false) String maSku,
@@ -98,8 +106,6 @@ public class AdminSanPhamController {
             sanPham.setTrongLuong(trongLuong);
             sanPham.setNgonNgu(ngonNgu);
 
-            // KHÔNG set ngayTao, ngayCapNhat, trangThai vì không có trong DB
-
             // Thêm danh mục many-to-many
             if (danhMucIds != null && !danhMucIds.isEmpty()) {
                 Set<DanhMuc> danhMucs = new HashSet<>();
@@ -124,6 +130,7 @@ public class AdminSanPhamController {
      * Hiển thị form sửa sản phẩm
      */
     @GetMapping("/sua/{id}")
+    @Transactional(readOnly = true)
     public String hienThiFormSua(@PathVariable Integer id, Model model, RedirectAttributes redirectAttributes) {
         SanPham sanPham = sanPhamRepository.findById(id).orElse(null);
 
@@ -131,6 +138,9 @@ public class AdminSanPhamController {
             redirectAttributes.addFlashAttribute("error", "Không tìm thấy sản phẩm!");
             return "redirect:/admin/san-pham";
         }
+
+        // Force load danh mục
+        sanPham.getDanhMucs().size();
 
         List<DanhMuc> danhMucList = danhMucRepository.findAll();
 
@@ -144,6 +154,7 @@ public class AdminSanPhamController {
      * Xử lý sửa sản phẩm
      */
     @PostMapping("/sua/{id}")
+    @Transactional
     public String suaSanPham(
             @PathVariable Integer id,
             @RequestParam String ten,
@@ -180,8 +191,6 @@ public class AdminSanPhamController {
             sanPham.setTrongLuong(trongLuong);
             sanPham.setNgonNgu(ngonNgu);
 
-            // KHÔNG set ngayCapNhat, trangThai
-
             // Cập nhật danh mục many-to-many
             sanPham.getDanhMucs().clear();
             if (danhMucIds != null && !danhMucIds.isEmpty()) {
@@ -205,6 +214,7 @@ public class AdminSanPhamController {
      * Xóa sản phẩm
      */
     @PostMapping("/xoa/{id}")
+    @Transactional
     public String xoaSanPham(@PathVariable Integer id, RedirectAttributes redirectAttributes) {
         try {
             SanPham sanPham = sanPhamRepository.findById(id).orElse(null);
@@ -229,6 +239,7 @@ public class AdminSanPhamController {
      * Xem chi tiết sản phẩm
      */
     @GetMapping("/{id}")
+    @Transactional(readOnly = true)
     public String chiTiet(@PathVariable Integer id, Model model, RedirectAttributes redirectAttributes) {
         SanPham sanPham = sanPhamRepository.findById(id).orElse(null);
 
@@ -236,6 +247,9 @@ public class AdminSanPhamController {
             redirectAttributes.addFlashAttribute("error", "Không tìm thấy sản phẩm!");
             return "redirect:/admin/san-pham";
         }
+
+        // Force load danh mục
+        sanPham.getDanhMucs().size();
 
         model.addAttribute("sanPham", sanPham);
 

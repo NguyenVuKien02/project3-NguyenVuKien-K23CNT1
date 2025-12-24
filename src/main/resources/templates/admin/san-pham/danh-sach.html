@@ -62,101 +62,103 @@
         </div>
 
         <!-- Table -->
-        <table class="data-table" th:if="${sanPhamPage.content != null and !sanPhamPage.content.isEmpty()}">
-            <thead>
-            <tr>
-                <th>ID</th>
-                <th>Hình ảnh</th>
-                <th>Tên sản phẩm</th>
-                <th>Danh mục</th>
-                <th>Giá</th>
-                <th>Tồn kho</th>
-                <th>Trạng thái</th>
-                <th>Thao tác</th>
-            </tr>
-            </thead>
-            <tbody>
-            <tr th:each="sp : ${sanPhamPage.content}">
-                <td><strong th:text="${sp.id}">1</strong></td>
-                <td>
-                    <img th:if="${sp.anhDaiDien != null and !sp.anhDaiDien.isEmpty()}"
-                         th:src="${sp.anhDaiDien}"
-                         alt="Product"
-                         style="width: 50px; height: 60px; object-fit: cover; border-radius: 4px;">
-                    <div th:if="${sp.anhDaiDien == null or sp.anhDaiDien.isEmpty()}"
-                         style="width: 50px; height: 60px; background: #f0f0f0; border-radius: 4px; display: flex; align-items: center; justify-content: center;">
-                        <i class="fas fa-image" style="color: #ccc;"></i>
-                    </div>
-                </td>
-                <td>
-                    <strong th:text="${sp.ten}">Tên sản phẩm</strong>
-                    <div style="font-size: 12px; color: #999;" th:if="${sp.maSku != null}">
-                        <i class="fas fa-barcode"></i>
-                        <span th:text="${sp.maSku}">SKU</span>
-                    </div>
-                </td>
-                <td>
-                    <!-- Hiển thị danh mục từ Set -->
-                    <div th:if="${sp.danhMucs != null and !sp.danhMucs.isEmpty()}">
-                                <span th:each="dm, iterStat : ${sp.danhMucs}"
-                                      class="status-badge badge-info"
-                                      style="font-size: 11px; margin: 2px;">
-                                    <span th:text="${dm.ten}">Danh mục</span>
-                                </span>
-                    </div>
-                    <span th:if="${sp.danhMucs == null or sp.danhMucs.isEmpty()}" style="color: #999;">
-                                Chưa phân loại
+        <div class="table-wrapper">
+            <table class="product-table" th:if="${sanPhamPage.content != null and !sanPhamPage.content.isEmpty()}">
+                <thead>
+                <tr>
+                    <th class="col-id">ID</th>
+                    <th class="col-image">Hình</th>
+                    <th class="col-name">Tên sản phẩm</th>
+                    <th class="col-category">Danh mục</th>
+                    <th class="col-price">Giá</th>
+                    <th class="col-stock">Tồn kho</th>
+                    <th class="col-status">Trạng thái</th>
+                    <th class="col-actions">Thao tác</th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr th:each="sp : ${sanPhamPage.content}">
+                    <td class="text-center">
+                        <strong th:text="${sp.id}">1</strong>
+                    </td>
+                    <td>
+                        <img th:if="${sp.anhDaiDien != null and !sp.anhDaiDien.isEmpty()}"
+                             th:src="${sp.anhDaiDien}"
+                             alt="Product"
+                             class="product-img">
+                        <div th:if="${sp.anhDaiDien == null or sp.anhDaiDien.isEmpty()}"
+                             class="product-img-placeholder">
+                            <i class="fas fa-image"></i>
+                        </div>
+                    </td>
+                    <td>
+                        <div class="product-name" th:text="${sp.ten}">Tên sản phẩm</div>
+                        <div class="product-sku" th:if="${sp.maSku != null}">
+                            <i class="fas fa-barcode"></i>
+                            <span th:text="${sp.maSku}">SKU</span>
+                        </div>
+                    </td>
+                    <td>
+                        <div th:if="${sp.danhMucs != null and !sp.danhMucs.isEmpty()}" class="category-tags">
+                            <span th:each="dm : ${sp.danhMucs}"
+                                  class="status-badge badge-info"
+                                  th:text="${dm.ten}">
+                                Danh mục
                             </span>
-                </td>
-                <td>
-                    <strong th:text="${#numbers.formatDecimal(sp.gia, 0, 'COMMA', 0, 'POINT')} + '₫'">
-                        30,000₫
-                    </strong>
-                </td>
-                <td>
-                    <span th:text="${sp.soLuongTon}">10</span>
-                    <span th:if="${sp.soLuongTon <= 5}" style="color: #ff6b6b;">
-                                <i class="fas fa-exclamation-triangle"></i>
-                            </span>
-                </td>
-                <td>
-                    <!-- Hiển thị trạng thái dựa trên số lượng tồn -->
-                    <span class="status-badge"
-                          th:classappend="${sp.soLuongTon > 5 ? 'badge-success' : (sp.soLuongTon > 0 ? 'badge-warning' : 'badge-danger')}"
-                          th:text="${sp.soLuongTon > 5 ? 'Còn hàng' : (sp.soLuongTon > 0 ? 'Sắp hết' : 'Hết hàng')}">
-                                Còn hàng
-                            </span>
-                </td>
-                <td>
-                    <div style="display: flex; gap: 5px;">
-                        <a th:href="@{'/admin/san-pham/' + ${sp.id}}"
-                           class="btn btn-primary"
-                           style="padding: 6px 12px; font-size: 13px;"
-                           title="Xem chi tiết">
-                            <i class="fas fa-eye"></i>
-                        </a>
-                        <a th:href="@{'/admin/san-pham/sua/' + ${sp.id}}"
-                           class="btn btn-warning"
-                           style="padding: 6px 12px; font-size: 13px;"
-                           title="Sửa">
-                            <i class="fas fa-edit"></i>
-                        </a>
-                        <form th:action="@{'/admin/san-pham/xoa/' + ${sp.id}}"
-                              method="post"
-                              style="display: inline;"
-                              onsubmit="return confirm('Bạn có chắc muốn xóa sản phẩm này?')">
-                            <button type="submit"
-                                    class="btn btn-danger"
-                                    style="padding: 6px 12px; font-size: 13px;"
-                                    title="Xóa">
-                                <i class="fas fa-trash"></i>
-                            </button>
-                        </form>
-                    </div>
-                </td>
-            </tr>
-            </tbody>
-        </table>
+                        </div>
+                        <span th:if="${sp.danhMucs == null or sp.danhMucs.isEmpty()}"
+                              class="text-muted">
+                            Chưa phân loại
+                        </span>
+                    </td>
+                    <td class="text-right">
+                        <strong class="product-price"
+                                th:text="${#numbers.formatDecimal(sp.gia, 0, 'COMMA', 0, 'POINT')} + '₫'">
+                            90,000₫
+                        </strong>
+                    </td>
+                    <td class="text-center">
+                        <div>
+                            <strong th:text="${sp.soLuongTon}">100</strong>
+                            <i th:if="${sp.soLuongTon != null and sp.soLuongTon <= 5}"
+                               class="fas fa-exclamation-triangle text-danger"></i>
+                        </div>
+                    </td>
+                    <td class="text-center">
+                        <span class="status-badge"
+                              th:classappend="${sp.soLuongTon != null and sp.soLuongTon > 5 ? 'badge-success' : (sp.soLuongTon != null and sp.soLuongTon > 0 ? 'badge-warning' : 'badge-danger')}"
+                              th:text="${sp.soLuongTon != null and sp.soLuongTon > 5 ? 'Còn hàng' : (sp.soLuongTon != null and sp.soLuongTon > 0 ? 'Sắp hết' : 'Hết hàng')}">
+                            Còn hàng
+                        </span>
+                    </td>
+                    <td>
+                        <div class="action-buttons">
+                            <a th:href="@{'/admin/san-pham/' + ${sp.id}}"
+                               class="btn-icon btn-view"
+                               title="Xem chi tiết">
+                                <i class="fas fa-eye"></i>
+                            </a>
+                            <a th:href="@{'/admin/san-pham/sua/' + ${sp.id}}"
+                               class="btn-icon btn-edit"
+                               title="Sửa">
+                                <i class="fas fa-edit"></i>
+                            </a>
+                            <form th:action="@{'/admin/san-pham/xoa/' + ${sp.id}}"
+                                  method="post"
+                                  style="display: inline-block; margin: 0;"
+                                  onsubmit="return confirm('Bạn có chắc muốn xóa sản phẩm này?')">
+                                <button type="submit"
+                                        class="btn-icon btn-delete"
+                                        title="Xóa">
+                                    <i class="fas fa-trash"></i>
+                                </button>
+                            </form>
+                        </div>
+                    </td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
 
         <!-- Empty State -->
         <div class="empty-state" th:if="${sanPhamPage.content == null or sanPhamPage.content.isEmpty()}">
@@ -170,25 +172,231 @@
         </div>
 
         <!-- Pagination -->
-        <div class="pagination" th:if="${sanPhamPage.totalPages > 1}">
+        <div class="custom-pagination" th:if="${sanPhamPage.totalPages > 1}">
             <a th:if="${sanPhamPage.number > 0}"
-               th:href="@{/admin/san-pham(page=${sanPhamPage.number - 1}, keyword=${keyword})}">
-                <i class="fas fa-chevron-left"></i> Trước
+               th:href="@{/admin/san-pham(page=${sanPhamPage.number - 1}, keyword=${keyword})}"
+               class="page-btn">
+                <i class="fas fa-chevron-left"></i>
             </a>
 
             <span th:each="i : ${#numbers.sequence(0, sanPhamPage.totalPages - 1)}"
                   th:if="${i >= sanPhamPage.number - 2 and i <= sanPhamPage.number + 2}">
-                    <a th:href="@{/admin/san-pham(page=${i}, keyword=${keyword})}"
-                       th:classappend="${i == sanPhamPage.number} ? 'active' : ''"
-                       th:text="${i + 1}">1</a>
-                </span>
+                <a th:href="@{/admin/san-pham(page=${i}, keyword=${keyword})}"
+                   class="page-number"
+                   th:classappend="${i == sanPhamPage.number} ? 'active' : ''"
+                   th:text="${i + 1}">1</a>
+            </span>
 
             <a th:if="${sanPhamPage.number < sanPhamPage.totalPages - 1}"
-               th:href="@{/admin/san-pham(page=${sanPhamPage.number + 1}, keyword=${keyword})}">
-                Sau <i class="fas fa-chevron-right"></i>
+               th:href="@{/admin/san-pham(page=${sanPhamPage.number + 1}, keyword=${keyword})}"
+               class="page-btn">
+                <i class="fas fa-chevron-right"></i>
             </a>
         </div>
     </div>
 </main>
+
+<!-- Custom CSS -->
+<style>
+    /* Table Wrapper - No Scroll */
+    .table-wrapper {
+        background: white;
+        border-radius: 8px;
+        overflow: visible;
+    }
+
+    /* Product Table - Fit to Screen */
+    .product-table {
+        width: 100%;
+        border-collapse: collapse;
+        table-layout: fixed;
+    }
+
+    .product-table thead {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+    }
+
+    .product-table th {
+        padding: 14px 8px;
+        font-size: 12px;
+        font-weight: 600;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        white-space: nowrap;
+    }
+
+    .product-table td {
+        padding: 12px 8px;
+        border-bottom: 1px solid #f0f0f0;
+        font-size: 13px;
+        vertical-align: middle;
+    }
+
+    .product-table tbody tr:hover {
+        background: #f8f9fa;
+    }
+
+    /* Column Widths - Fit Screen */
+    .col-id { width: 50px; text-align: center; }
+    .col-image { width: 70px; }
+    .col-name { width: auto; min-width: 180px; }
+    .col-category { width: 120px; }
+    .col-price { width: 100px; text-align: right; }
+    .col-stock { width: 80px; text-align: center; }
+    .col-status { width: 100px; text-align: center; }
+    .col-actions { width: 130px; text-align: center; }
+
+    /* Product Image */
+    .product-img {
+        width: 50px;
+        height: 65px;
+        object-fit: cover;
+        border-radius: 4px;
+        display: block;
+        box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    }
+
+    .product-img-placeholder {
+        width: 50px;
+        height: 65px;
+        background: linear-gradient(135deg, #f5f7fa 0%, #e0e0e0 100%);
+        border-radius: 4px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: #999;
+        font-size: 20px;
+    }
+
+    /* Product Info */
+    .product-name {
+        font-weight: 600;
+        color: #333;
+        margin-bottom: 4px;
+        line-height: 1.3;
+    }
+
+    .product-sku {
+        font-size: 11px;
+        color: #999;
+    }
+
+    .product-price {
+        color: #ff6b6b;
+        font-size: 15px;
+    }
+
+    /* Category Tags */
+    .category-tags {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 4px;
+    }
+
+    .category-tags .status-badge {
+        font-size: 10px;
+        padding: 3px 8px;
+        white-space: nowrap;
+    }
+
+    /* Action Buttons - Compact */
+    .action-buttons {
+        display: flex;
+        gap: 4px;
+        justify-content: center;
+    }
+
+    .btn-icon {
+        width: 32px;
+        height: 32px;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        border-radius: 6px;
+        border: none;
+        cursor: pointer;
+        transition: all 0.2s;
+        font-size: 13px;
+    }
+
+    .btn-view {
+        background: #667eea;
+        color: white;
+    }
+
+    .btn-edit {
+        background: #ff9800;
+        color: white;
+    }
+
+    .btn-delete {
+        background: #ff6b6b;
+        color: white;
+    }
+
+    .btn-icon:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 4px 8px rgba(0,0,0,0.15);
+    }
+
+    /* Utilities */
+    .text-center { text-align: center !important; }
+    .text-right { text-align: right !important; }
+    .text-muted { color: #999; font-size: 12px; }
+    .text-danger { color: #ff6b6b; margin-left: 4px; }
+
+    /* Custom Pagination */
+    .custom-pagination {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        gap: 8px;
+        margin-top: 30px;
+        padding: 20px;
+    }
+
+    .page-btn,
+    .page-number {
+        min-width: 40px;
+        height: 40px;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        background: white;
+        border: 2px solid #e0e0e0;
+        border-radius: 8px;
+        color: #667eea;
+        text-decoration: none;
+        font-weight: 600;
+        font-size: 14px;
+        transition: all 0.3s;
+        cursor: pointer;
+    }
+
+    .page-btn:hover,
+    .page-number:hover {
+        background: #667eea;
+        color: white;
+        border-color: #667eea;
+        transform: translateY(-2px);
+        box-shadow: 0 4px 12px rgba(102, 126, 234, 0.3);
+    }
+
+    .page-number.active {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+        border-color: #667eea;
+        box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
+    }
+
+    .page-btn {
+        width: 40px;
+    }
+
+    .page-btn i {
+        font-size: 12px;
+    }
+</style>
 </body>
 </html>

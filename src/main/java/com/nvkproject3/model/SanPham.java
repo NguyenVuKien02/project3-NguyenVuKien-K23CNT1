@@ -1,13 +1,16 @@
 package com.nvkproject3.model;
 
 import jakarta.persistence.*;
-import lombok.Data;
+import lombok.Getter;
+import lombok.Setter;
 import java.util.HashSet;
+import java.util.Objects;
 import java.util.Set;
 
 @Entity
 @Table(name = "san_pham")
-@Data
+@Getter
+@Setter
 public class SanPham {
 
     @Id
@@ -47,9 +50,6 @@ public class SanPham {
     @Column(name = "ngon_ngu")
     private String ngonNgu;
 
-    // KHÔNG CÓ: ngayTao, ngayCapNhat, trangThai trong database gốc
-    // Nếu muốn thêm, phải ALTER TABLE trước
-
     // Many-to-Many với DanhMuc qua bảng trung gian
     @ManyToMany(fetch = FetchType.LAZY)
     @JoinTable(
@@ -60,7 +60,6 @@ public class SanPham {
     private Set<DanhMuc> danhMucs = new HashSet<>();
 
     // Transient field - không map vào database
-    // Dùng để hiển thị trạng thái trong code
     @Transient
     public String getTrangThaiDisplay() {
         if (soLuongTon == null || soLuongTon <= 0) {
@@ -72,14 +71,17 @@ public class SanPham {
         }
     }
 
-    // Helper methods
-    public void themDanhMuc(DanhMuc danhMuc) {
-        this.danhMucs.add(danhMuc);
-        danhMuc.getSanPhams().add(this);
+    // QUAN TRỌNG: Override equals và hashCode chỉ dùng ID
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (!(o instanceof SanPham)) return false;
+        SanPham sanPham = (SanPham) o;
+        return id != null && Objects.equals(id, sanPham.id);
     }
 
-    public void xoaDanhMuc(DanhMuc danhMuc) {
-        this.danhMucs.remove(danhMuc);
-        danhMuc.getSanPhams().remove(this);
+    @Override
+    public int hashCode() {
+        return getClass().hashCode();
     }
 }

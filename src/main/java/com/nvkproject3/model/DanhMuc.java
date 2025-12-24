@@ -1,13 +1,16 @@
 package com.nvkproject3.model;
 
 import jakarta.persistence.*;
-import lombok.Data;
+import lombok.Getter;
+import lombok.Setter;
 import java.util.HashSet;
+import java.util.Objects;
 import java.util.Set;
 
 @Entity
 @Table(name = "danh_muc")
-@Data
+@Getter
+@Setter
 public class DanhMuc {
 
     @Id
@@ -34,4 +37,18 @@ public class DanhMuc {
     // Many-to-Many với SanPham
     @ManyToMany(mappedBy = "danhMucs", fetch = FetchType.LAZY)
     private Set<SanPham> sanPhams = new HashSet<>();
+
+    // QUAN TRỌNG: Override equals và hashCode chỉ dùng ID
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (!(o instanceof DanhMuc)) return false;
+        DanhMuc danhMuc = (DanhMuc) o;
+        return id != null && Objects.equals(id, danhMuc.id);
+    }
+
+    @Override
+    public int hashCode() {
+        return getClass().hashCode();
+    }
 }

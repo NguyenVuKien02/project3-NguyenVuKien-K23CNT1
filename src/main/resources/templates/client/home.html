@@ -207,26 +207,78 @@
             padding: 0 20px;
         }
 
-        .banner-slide {
-            width: 100%;
-            height: 400px;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            color: white;
-            border-radius: 10px;
-            text-align: center;
-        }
+/* ===== Banner Slider (NXB Kim Đồng style) ===== */
+.banner-slider {
+    max-width: 1200px;
+    margin: 30px auto;
+    padding: 0 20px;
+    position: relative;
+    overflow: hidden;
+    border-radius: 16px;
+}
 
-        .banner-slide h1 {
-            font-size: 42px;
-            margin-bottom: 15px;
-        }
+.banner-track {
+    display: flex;
+    transition: transform 0.6s ease-in-out;
+}
 
-        .banner-slide p {
-            font-size: 18px;
-        }
+.banner-item {
+    min-width: 100%;
+}
+
+.banner-item img {
+    width: 100%;
+    height: 500px; /* 👈 phù hợp ảnh bạn gửi */
+    object-fit: cover;
+    display: block;
+    border-radius: 16px;
+}
+
+/* Buttons */
+.banner-btn {
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    background: rgba(0,0,0,0.4);
+    color: white;
+    border: none;
+    width: 45px;
+    height: 45px;
+    border-radius: 50%;
+    font-size: 22px;
+    cursor: pointer;
+    z-index: 10;
+}
+
+.banner-btn:hover {
+    background: rgba(0,0,0,0.6);
+}
+
+.banner-btn.prev { left: 30px; }
+.banner-btn.next { right: 30px; }
+
+/* Dots */
+.banner-dots {
+    position: absolute;
+    bottom: 15px;
+    width: 100%;
+    text-align: center;
+}
+
+.banner-dots span {
+    display: inline-block;
+    width: 10px;
+    height: 10px;
+    margin: 0 5px;
+    background: rgba(255,255,255,0.6);
+    border-radius: 50%;
+    cursor: pointer;
+}
+
+.banner-dots span.active {
+    background: white;
+}
+
 
         /* Section */
         .section {
@@ -542,15 +594,33 @@
     </div>
 </nav>
 
-<!-- Banner -->
+<!-- Banner Slider -->
 <div class="banner-slider">
-    <div class="banner-slide">
-        <div>
-            <h1>🎉 Chào mừng đến với Cửa Hàng Sách</h1>
-            <p>Manga & Light Novel chất lượng cao</p>
+    <div class="banner-track" id="bannerTrack">
+        <div class="banner-item">
+            <img src="/images/products/banner_totoro.jpg" alt="Banner 1">
+        </div>
+        <div class="banner-item">
+            <img src="/images/products/banner_kagurabachi.jpg" alt="Banner 2">
+        </div>
+        <div class="banner-item">
+            <img src="/images/products/banner_thuycung.jpg" alt="Banner 3">
         </div>
     </div>
+
+    <!-- Buttons -->
+    <button class="banner-btn prev" onclick="prevBanner()">❮</button>
+    <button class="banner-btn next" onclick="nextBanner()">❯</button>
+
+    <!-- Dots -->
+    <div class="banner-dots">
+        <span onclick="goBanner(0)"></span>
+        <span onclick="goBanner(1)"></span>
+        <span onclick="goBanner(2)"></span>
+    </div>
 </div>
+
+
 
 <!-- Sản phẩm mới -->
 <section class="section">
@@ -630,5 +700,37 @@
 </footer>
 <!-- JavaScript cho giỏ hàng -->
 <script src="/js/cart.js"></script>
+<script>
+    let currentIndex = 0;
+    const banners = document.querySelectorAll(".banner-item");
+    const track = document.getElementById("bannerTrack");
+    const dots = document.querySelectorAll(".banner-dots span");
+
+    function updateBanner() {
+        track.style.transform = `translateX(-${currentIndex * 100}%)`;
+        dots.forEach((d, i) => d.classList.toggle("active", i === currentIndex));
+    }
+
+    function nextBanner() {
+        currentIndex = (currentIndex + 1) % banners.length;
+        updateBanner();
+    }
+
+    function prevBanner() {
+        currentIndex = (currentIndex - 1 + banners.length) % banners.length;
+        updateBanner();
+    }
+
+    function goBanner(index) {
+        currentIndex = index;
+        updateBanner();
+    }
+
+    // Auto slide
+    setInterval(nextBanner, 5000);
+
+    updateBanner();
+</script>
+
 </body>
 </html>

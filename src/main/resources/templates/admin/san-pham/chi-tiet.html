@@ -1,6 +1,25 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org">
-<head th:replace="admin/admin-layout :: head('Chi tiết sản phẩm')"></head>
+<head th:replace="admin/admin-layout :: head('Chi tiết sản phẩm')">
+    <style>
+        /* Critical CSS inline */
+        .breadcrumb-nav {
+            display: flex !important;
+            align-items: center !important;
+            gap: 10px !important;
+            padding: 15px 0 !important;
+            font-size: 14px !important;
+            color: #666 !important;
+            margin-bottom: 20px !important;
+        }
+
+        .product-detail-wrapper {
+            display: grid !important;
+            grid-template-columns: 400px 1fr !important;
+            gap: 25px !important;
+        }
+    </style>
+</head>
 <body>
 <!-- Sidebar -->
 <aside th:replace="admin/admin-layout :: sidebar('san-pham')"></aside>
@@ -10,174 +29,246 @@
     <!-- Header -->
     <div th:replace="admin/admin-layout :: header('Chi tiết sản phẩm', 'fas fa-info-circle')"></div>
 
+    <!-- Breadcrumb -->
+    <div style="display: flex; align-items: center; gap: 10px; padding: 15px 0; font-size: 14px; color: #666; margin-bottom: 20px;">
+        <a href="/admin/dashboard" style="color: #667eea; text-decoration: none;">
+            <i class="fas fa-home"></i> Dashboard
+        </a>
+        <i class="fas fa-chevron-right" style="font-size: 10px; color: #ccc;"></i>
+        <a href="/admin/san-pham" style="color: #667eea; text-decoration: none;">Sản phẩm</a>
+        <i class="fas fa-chevron-right" style="font-size: 10px; color: #ccc;"></i>
+        <span th:text="${sanPham.ten}">Chi tiết</span>
+    </div>
+
     <!-- Content -->
-    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 25px;">
-        <!-- Left: Image & Actions -->
-        <div>
-            <div class="content-section">
-                <h3 style="margin-bottom: 20px; color: #333;">
-                    <i class="fas fa-image"></i> Hình ảnh
-                </h3>
-                <div th:if="${sanPham.anhDaiDien != null and !sanPham.anhDaiDien.isEmpty()}"
-                     style="text-align: center;">
-                    <img th:src="${sanPham.anhDaiDien}" alt="Product"
-                         style="max-width: 100%; border-radius: 10px; box-shadow: 0 4px 12px rgba(0,0,0,0.1);">
-                </div>
-                <div th:if="${sanPham.anhDaiDien == null or sanPham.anhDaiDien.isEmpty()}"
-                     style="height: 400px; background: #f0f0f0; border-radius: 10px; display: flex; align-items: center; justify-content: center;">
-                    <i class="fas fa-image" style="font-size: 80px; color: #ccc;"></i>
+    <div style="display: grid; grid-template-columns: 400px 1fr; gap: 25px;">
+        <!-- Left Column -->
+        <div style="display: flex; flex-direction: column; gap: 20px;">
+            <!-- Image Card -->
+            <div style="background: white; border-radius: 12px; padding: 20px; box-shadow: 0 2px 8px rgba(0,0,0,0.06);">
+                <div style="border-radius: 10px; overflow: hidden; background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);">
+                    <img th:if="${sanPham.anhDaiDien != null and !sanPham.anhDaiDien.isEmpty()}"
+                         th:src="${sanPham.anhDaiDien}"
+                         alt="Product"
+                         style="width: 100%; height: auto; display: block; object-fit: cover;">
+                    <div th:if="${sanPham.anhDaiDien == null or sanPham.anhDaiDien.isEmpty()}"
+                         style="height: 500px; display: flex; flex-direction: column; align-items: center; justify-content: center; color: #999;">
+                        <i class="fas fa-image" style="font-size: 80px; margin-bottom: 15px;"></i>
+                        <p>Chưa có hình ảnh</p>
+                    </div>
                 </div>
             </div>
 
-            <div class="content-section">
-                <h3 style="margin-bottom: 20px; color: #333;">
+            <!-- Quick Stats -->
+            <div style="display: flex; flex-direction: column; gap: 12px;">
+                <!-- Price -->
+                <div style="background: white; border-radius: 10px; padding: 15px; display: flex; align-items: center; gap: 15px; box-shadow: 0 2px 8px rgba(0,0,0,0.06);">
+                    <div style="width: 50px; height: 50px; border-radius: 10px; display: flex; align-items: center; justify-content: center; font-size: 22px; background: linear-gradient(135deg, #ff6b6b 0%, #ff8787 100%); color: white;">
+                        <i class="fas fa-tag"></i>
+                    </div>
+                    <div style="flex: 1;">
+                        <div style="font-size: 12px; color: #999; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 5px;">Giá bán</div>
+                        <div style="font-size: 20px; font-weight: 700; color: #ff6b6b;">
+                            <span th:text="${#numbers.formatDecimal(sanPham.gia, 0, 'COMMA', 0, 'POINT')}">90,000</span>₫
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Stock -->
+                <div style="background: white; border-radius: 10px; padding: 15px; display: flex; align-items: center; gap: 15px; box-shadow: 0 2px 8px rgba(0,0,0,0.06);">
+                    <div style="width: 50px; height: 50px; border-radius: 10px; display: flex; align-items: center; justify-content: center; font-size: 22px; background: linear-gradient(135deg, #4caf50 0%, #66bb6a 100%); color: white;">
+                        <i class="fas fa-box"></i>
+                    </div>
+                    <div style="flex: 1;">
+                        <div style="font-size: 12px; color: #999; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 5px;">Tồn kho</div>
+                        <div style="font-size: 20px; font-weight: 700; color: #333;">
+                            <span th:text="${sanPham.soLuongTon}">100</span> sản phẩm
+                            <div th:if="${sanPham.soLuongTon != null and sanPham.soLuongTon <= 5}"
+                                 style="font-size: 12px; color: #ff6b6b; font-weight: 600; margin-top: 4px;">
+                                <i class="fas fa-exclamation-triangle"></i> Sắp hết
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Status -->
+                <div style="background: white; border-radius: 10px; padding: 15px; display: flex; align-items: center; gap: 15px; box-shadow: 0 2px 8px rgba(0,0,0,0.06);">
+                    <div style="width: 50px; height: 50px; border-radius: 10px; display: flex; align-items: center; justify-content: center; font-size: 22px; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white;">
+                        <i class="fas fa-check-circle"></i>
+                    </div>
+                    <div style="flex: 1;">
+                        <div style="font-size: 12px; color: #999; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 5px;">Trạng thái</div>
+                        <div>
+                            <span class="status-badge"
+                                  th:classappend="${sanPham.soLuongTon != null and sanPham.soLuongTon > 5 ? 'badge-success' : (sanPham.soLuongTon != null and sanPham.soLuongTon > 0 ? 'badge-warning' : 'badge-danger')}"
+                                  th:text="${sanPham.soLuongTon != null and sanPham.soLuongTon > 5 ? 'Còn hàng' : (sanPham.soLuongTon != null and sanPham.soLuongTon > 0 ? 'Sắp hết' : 'Hết hàng')}">
+                                Còn hàng
+                            </span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Action Buttons -->
+            <div style="background: white; border-radius: 12px; padding: 20px; box-shadow: 0 2px 8px rgba(0,0,0,0.06);">
+                <h4 style="font-size: 16px; color: #333; margin-bottom: 15px; display: flex; align-items: center; gap: 8px;">
                     <i class="fas fa-tools"></i> Thao tác
-                </h3>
+                </h4>
                 <div style="display: flex; flex-direction: column; gap: 10px;">
-                    <a th:href="@{'/admin/san-pham/sua/' + ${sanPham.id}}" class="btn btn-warning" style="justify-content: center;">
-                        <i class="fas fa-edit"></i> Sửa sản phẩm
+                    <a th:href="@{'/admin/san-pham/sua/' + ${sanPham.id}}"
+                       style="display: flex; align-items: center; justify-content: center; gap: 8px; padding: 12px 20px; border: none; border-radius: 8px; font-size: 14px; font-weight: 600; cursor: pointer; text-decoration: none; background: linear-gradient(135deg, #ff9800 0%, #ffb74d 100%); color: white;">
+                        <i class="fas fa-edit"></i>
+                        <span>Chỉnh sửa</span>
                     </a>
-                    <form th:action="@{'/admin/san-pham/xoa/' + ${sanPham.id}}" method="post"
-                          onsubmit="return confirm('Bạn có chắc muốn xóa sản phẩm này?')">
-                        <button type="submit" class="btn btn-danger" style="width: 100%; justify-content: center;">
-                            <i class="fas fa-trash"></i> Xóa sản phẩm
+                    <form th:action="@{'/admin/san-pham/xoa/' + ${sanPham.id}}"
+                          method="post"
+                          style="margin: 0;"
+                          onsubmit="return confirm('⚠️ Bạn có chắc muốn xóa sản phẩm này?\n\nHành động này không thể hoàn tác!')">
+                        <button type="submit"
+                                style="width: 100%; display: flex; align-items: center; justify-content: center; gap: 8px; padding: 12px 20px; border: none; border-radius: 8px; font-size: 14px; font-weight: 600; cursor: pointer; background: linear-gradient(135deg, #ff6b6b 0%, #ff8787 100%); color: white;">
+                            <i class="fas fa-trash-alt"></i>
+                            <span>Xóa sản phẩm</span>
                         </button>
                     </form>
-                    <a href="/admin/san-pham" class="btn btn-secondary" style="justify-content: center;">
-                        <i class="fas fa-arrow-left"></i> Quay lại danh sách
+                    <a href="/admin/san-pham"
+                       style="display: flex; align-items: center; justify-content: center; gap: 8px; padding: 12px 20px; border: none; border-radius: 8px; font-size: 14px; font-weight: 600; cursor: pointer; text-decoration: none; background: #f5f7fa; color: #666;">
+                        <i class="fas fa-arrow-left"></i>
+                        <span>Quay lại</span>
                     </a>
                 </div>
             </div>
         </div>
 
-        <!-- Right: Details -->
-        <div>
-            <div class="content-section">
-                <h3 style="margin-bottom: 20px; color: #333;">
-                    <i class="fas fa-info-circle"></i> Thông tin chi tiết
-                </h3>
-
-                <div style="display: flex; flex-direction: column; gap: 20px;">
-                    <div>
-                        <label style="font-size: 13px; color: #999; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 5px; display: block;">
-                            Tên sản phẩm
-                        </label>
-                        <div style="font-size: 20px; font-weight: bold; color: #333;" th:text="${sanPham.ten}">
-                            Tên sản phẩm
-                        </div>
-                    </div>
-
-                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px;">
-                        <div>
-                            <label style="font-size: 13px; color: #999; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 5px; display: block;">
-                                Giá bán
-                            </label>
-                            <div style="font-size: 24px; font-weight: bold; color: #4caf50;">
-                                <span th:text="${#numbers.formatDecimal(sanPham.gia, 0, 'COMMA', 0, 'POINT')}">30,000</span>₫
-                            </div>
-                        </div>
-
-                        <div>
-                            <label style="font-size: 13px; color: #999; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 5px; display: block;">
-                                Tồn kho
-                            </label>
-                            <div style="font-size: 24px; font-weight: bold; color: #333;">
-                                <span th:text="${sanPham.soLuongTon}">100</span>
-                                <span th:if="${sanPham.soLuongTon <= 5}" style="color: #ff6b6b; font-size: 14px;">
-                                        <i class="fas fa-exclamation-triangle"></i> Sắp hết
-                                    </span>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div>
-                        <label style="font-size: 13px; color: #999; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 5px; display: block;">
-                            Trạng thái
-                        </label>
-                        <span class="status-badge"
-                              th:classappend="${sanPham.trangThai == T(com.nvkproject3.model.SanPham.TrangThai).con_hang ? 'badge-success' :
-                                                   sanPham.trangThai == T(com.nvkproject3.model.SanPham.TrangThai).het_hang ? 'badge-danger' : 'badge-warning'}"
-                              th:text="${sanPham.trangThai == T(com.nvkproject3.model.SanPham.TrangThai).con_hang ? 'Còn hàng' :
-                                             sanPham.trangThai == T(com.nvkproject3.model.SanPham.TrangThai).het_hang ? 'Hết hàng' : 'Ngừng kinh doanh'}"
-                              style="font-size: 14px;">
-                                Còn hàng
+        <!-- Right Column -->
+        <div style="display: flex; flex-direction: column; gap: 20px;">
+            <!-- Basic Info -->
+            <div style="background: white; border-radius: 12px; box-shadow: 0 2px 8px rgba(0,0,0,0.06); overflow: hidden;">
+                <div style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; padding: 15px 20px;">
+                    <h3 style="font-size: 16px; margin: 0; display: flex; align-items: center; gap: 10px;">
+                        <i class="fas fa-info-circle"></i> Thông tin cơ bản
+                    </h3>
+                </div>
+                <div style="padding: 20px;">
+                    <!-- ID -->
+                    <div style="display: flex; padding: 15px 0; border-bottom: 1px solid #f0f0f0;">
+                        <div style="width: 150px; font-size: 13px; color: #999; text-transform: uppercase; letter-spacing: 0.5px;">ID Sản phẩm</div>
+                        <div style="flex: 1; font-size: 15px; color: #333; font-weight: 500;">
+                            <span style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; padding: 5px 12px; border-radius: 6px; font-size: 14px; font-weight: 700;">
+                                #<span th:text="${sanPham.id}">13</span>
                             </span>
-                    </div>
-
-                    <div>
-                        <label style="font-size: 13px; color: #999; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 5px; display: block;">
-                            Danh mục
-                        </label>
-                        <div style="font-size: 16px; color: #333;" th:text="${sanPham.danhMuc != null ? sanPham.danhMuc.ten : 'N/A'}">
-                            Danh mục
                         </div>
                     </div>
 
-                    <div th:if="${sanPham.tacGia != null}">
-                        <label style="font-size: 13px; color: #999; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 5px; display: block;">
-                            Tác giả
-                        </label>
-                        <div style="font-size: 16px; color: #333;" th:text="${sanPham.tacGia.ten}">
-                            Tác giả
+                    <!-- Name -->
+                    <div style="display: flex; padding: 15px 0; border-bottom: 1px solid #f0f0f0;">
+                        <div style="width: 150px; font-size: 13px; color: #999; text-transform: uppercase; letter-spacing: 0.5px;">Tên sản phẩm</div>
+                        <div style="flex: 1; font-size: 18px; font-weight: 700; color: #333;" th:text="${sanPham.ten}">
+                            Sword Art Online Tập 1
                         </div>
                     </div>
 
-                    <div th:if="${sanPham.nhaXuatBan != null}">
-                        <label style="font-size: 13px; color: #999; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 5px; display: block;">
-                            Nhà xuất bản
-                        </label>
-                        <div style="font-size: 16px; color: #333;" th:text="${sanPham.nhaXuatBan}">
-                            NXB
+                    <!-- SKU -->
+                    <div th:if="${sanPham.maSku != null}" style="display: flex; padding: 15px 0; border-bottom: 1px solid #f0f0f0;">
+                        <div style="width: 150px; font-size: 13px; color: #999; text-transform: uppercase; letter-spacing: 0.5px;">Mã SKU</div>
+                        <div style="flex: 1; font-size: 15px; color: #333; font-weight: 500;">
+                            <code style="background: #f5f7fa; padding: 4px 8px; border-radius: 4px; font-family: 'Courier New', monospace; color: #667eea; font-size: 14px;"
+                                  th:text="${sanPham.maSku}">IPM004</code>
                         </div>
                     </div>
 
-                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px;">
-                        <div th:if="${sanPham.namXuatBan != null}">
-                            <label style="font-size: 13px; color: #999; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 5px; display: block;">
-                                Năm xuất bản
-                            </label>
-                            <div style="font-size: 16px; color: #333;" th:text="${sanPham.namXuatBan}">
-                                2024
+                    <!-- Category -->
+                    <div style="display: flex; padding: 15px 0;">
+                        <div style="width: 150px; font-size: 13px; color: #999; text-transform: uppercase; letter-spacing: 0.5px;">Danh mục</div>
+                        <div style="flex: 1; font-size: 15px; color: #333; font-weight: 500;">
+                            <div th:if="${sanPham.danhMucs != null and !sanPham.danhMucs.isEmpty()}"
+                                 style="display: flex; flex-wrap: wrap; gap: 8px;">
+                                <span th:each="dm : ${sanPham.danhMucs}"
+                                      style="background: linear-gradient(135deg, #d1ecf1 0%, #bee5eb 100%); color: #0c5460; padding: 6px 14px; border-radius: 20px; font-size: 13px; font-weight: 600;"
+                                      th:text="${dm.ten}">
+                                    Light Novel
+                                </span>
                             </div>
+                            <span th:if="${sanPham.danhMucs == null or sanPham.danhMucs.isEmpty()}"
+                                  style="color: #999; font-style: italic;">
+                                <i class="fas fa-minus-circle"></i> Chưa phân loại
+                            </span>
                         </div>
+                    </div>
+                </div>
+            </div>
 
-                        <div th:if="${sanPham.soTrang != null}">
-                            <label style="font-size: 13px; color: #999; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 5px; display: block;">
-                                Số trang
-                            </label>
-                            <div style="font-size: 16px; color: #333;" th:text="${sanPham.soTrang}">
-                                200
-                            </div>
+            <!-- Publishing Info -->
+            <div th:if="${sanPham.nhaXuatBan != null or sanPham.namXuatBan != null or sanPham.soTrang != null}"
+                 style="background: white; border-radius: 12px; box-shadow: 0 2px 8px rgba(0,0,0,0.06); overflow: hidden;">
+                <div style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; padding: 15px 20px;">
+                    <h3 style="font-size: 16px; margin: 0; display: flex; align-items: center; gap: 10px;">
+                        <i class="fas fa-book"></i> Thông tin xuất bản
+                    </h3>
+                </div>
+                <div style="padding: 20px; display: grid; grid-template-columns: repeat(2, 1fr); gap: 20px;">
+                    <div th:if="${sanPham.nhaXuatBan != null}" style="display: flex; gap: 12px;">
+                        <div style="width: 40px; height: 40px; background: linear-gradient(135deg, #f5f7fa 0%, #e0e0e0 100%); border-radius: 8px; display: flex; align-items: center; justify-content: center; color: #667eea; font-size: 18px;">
+                            <i class="fas fa-building"></i>
+                        </div>
+                        <div style="flex: 1;">
+                            <div style="font-size: 12px; color: #999; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 5px;">Nhà xuất bản</div>
+                            <div style="font-size: 15px; color: #333; font-weight: 600;" th:text="${sanPham.nhaXuatBan}">Kim Đồng</div>
                         </div>
                     </div>
 
-                    <div th:if="${sanPham.moTa != null and !sanPham.moTa.isEmpty()}">
-                        <label style="font-size: 13px; color: #999; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 5px; display: block;">
-                            Mô tả
-                        </label>
-                        <div style="font-size: 14px; color: #666; line-height: 1.6;" th:text="${sanPham.moTa}">
-                            Mô tả sản phẩm
+                    <div th:if="${sanPham.namXuatBan != null}" style="display: flex; gap: 12px;">
+                        <div style="width: 40px; height: 40px; background: linear-gradient(135deg, #f5f7fa 0%, #e0e0e0 100%); border-radius: 8px; display: flex; align-items: center; justify-content: center; color: #667eea; font-size: 18px;">
+                            <i class="fas fa-calendar-alt"></i>
+                        </div>
+                        <div style="flex: 1;">
+                            <div style="font-size: 12px; color: #999; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 5px;">Năm xuất bản</div>
+                            <div style="font-size: 15px; color: #333; font-weight: 600;" th:text="${sanPham.namXuatBan}">2024</div>
                         </div>
                     </div>
 
-                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px; padding-top: 20px; border-top: 1px solid #f0f0f0;">
-                        <div>
-                            <label style="font-size: 13px; color: #999; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 5px; display: block;">
-                                Ngày tạo
-                            </label>
-                            <div style="font-size: 14px; color: #666;" th:text="${sanPham.ngayTao != null ? #temporals.format(sanPham.ngayTao, 'dd/MM/yyyy HH:mm') : 'N/A'}">
-                                17/12/2024 10:30
-                            </div>
+                    <div th:if="${sanPham.soTrang != null}" style="display: flex; gap: 12px;">
+                        <div style="width: 40px; height: 40px; background: linear-gradient(135deg, #f5f7fa 0%, #e0e0e0 100%); border-radius: 8px; display: flex; align-items: center; justify-content: center; color: #667eea; font-size: 18px;">
+                            <i class="fas fa-file-alt"></i>
                         </div>
+                        <div style="flex: 1;">
+                            <div style="font-size: 12px; color: #999; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 5px;">Số trang</div>
+                            <div style="font-size: 15px; color: #333; font-weight: 600;"><span th:text="${sanPham.soTrang}">200</span> trang</div>
+                        </div>
+                    </div>
 
-                        <div th:if="${sanPham.ngayCapNhat != null}">
-                            <label style="font-size: 13px; color: #999; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 5px; display: block;">
-                                Cập nhật lần cuối
-                            </label>
-                            <div style="font-size: 14px; color: #666;" th:text="${#temporals.format(sanPham.ngayCapNhat, 'dd/MM/yyyy HH:mm')}">
-                                18/12/2024 14:20
-                            </div>
+                    <div th:if="${sanPham.trongLuong != null}" style="display: flex; gap: 12px;">
+                        <div style="width: 40px; height: 40px; background: linear-gradient(135deg, #f5f7fa 0%, #e0e0e0 100%); border-radius: 8px; display: flex; align-items: center; justify-content: center; color: #667eea; font-size: 18px;">
+                            <i class="fas fa-weight"></i>
                         </div>
+                        <div style="flex: 1;">
+                            <div style="font-size: 12px; color: #999; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 5px;">Trọng lượng</div>
+                            <div style="font-size: 15px; color: #333; font-weight: 600;"><span th:text="${sanPham.trongLuong}">500</span>g</div>
+                        </div>
+                    </div>
+
+                    <div th:if="${sanPham.ngonNgu != null}" style="display: flex; gap: 12px;">
+                        <div style="width: 40px; height: 40px; background: linear-gradient(135deg, #f5f7fa 0%, #e0e0e0 100%); border-radius: 8px; display: flex; align-items: center; justify-content: center; color: #667eea; font-size: 18px;">
+                            <i class="fas fa-language"></i>
+                        </div>
+                        <div style="flex: 1;">
+                            <div style="font-size: 12px; color: #999; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 5px;">Ngôn ngữ</div>
+                            <div style="font-size: 15px; color: #333; font-weight: 600;" th:text="${sanPham.ngonNgu}">Tiếng Việt</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Description -->
+            <div th:if="${sanPham.moTa != null and !sanPham.moTa.isEmpty()}"
+                 style="background: white; border-radius: 12px; box-shadow: 0 2px 8px rgba(0,0,0,0.06); overflow: hidden;">
+                <div style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; padding: 15px 20px;">
+                    <h3 style="font-size: 16px; margin: 0; display: flex; align-items: center; gap: 10px;">
+                        <i class="fas fa-align-left"></i> Mô tả sản phẩm
+                    </h3>
+                </div>
+                <div style="padding: 20px;">
+                    <div style="font-size: 14px; line-height: 1.8; color: #666;" th:text="${sanPham.moTa}">
+                        Mô tả chi tiết về sản phẩm...
                     </div>
                 </div>
             </div>

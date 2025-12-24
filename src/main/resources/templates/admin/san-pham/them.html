@@ -10,195 +10,508 @@
     <!-- Header -->
     <div th:replace="admin/admin-layout :: header('Thêm sản phẩm mới', 'fas fa-plus')"></div>
 
+    <!-- Breadcrumb -->
+    <div style="display: flex; align-items: center; gap: 10px; padding: 15px 0; font-size: 14px; color: #666; margin-bottom: 20px;">
+        <a href="/admin/dashboard" style="color: #667eea; text-decoration: none;">
+            <i class="fas fa-home"></i> Dashboard
+        </a>
+        <i class="fas fa-chevron-right" style="font-size: 10px; color: #ccc;"></i>
+        <a href="/admin/san-pham" style="color: #667eea; text-decoration: none;">Sản phẩm</a>
+        <i class="fas fa-chevron-right" style="font-size: 10px; color: #ccc;"></i>
+        <span>Thêm mới</span>
+    </div>
+
     <!-- Alert Messages -->
-    <div class="alert alert-error" th:if="${error}">
+    <div class="alert alert-error" th:if="${error}" style="margin-bottom: 20px;">
         <i class="fas fa-exclamation-circle"></i>
         <span th:text="${error}">Lỗi</span>
     </div>
 
     <!-- Form -->
-    <div class="content-section">
-        <form th:action="@{/admin/san-pham/them}" method="post">
-            <div style="display: grid; grid-template-columns: 2fr 1fr; gap: 30px;">
-                <!-- Left Column -->
-                <div>
-                    <h3 style="margin-bottom: 20px; color: #333;">Thông tin cơ bản</h3>
-
-                    <div style="margin-bottom: 20px;">
-                        <label style="display: block; margin-bottom: 8px; font-weight: 500; color: #333;">
-                            Tên sản phẩm <span style="color: #ff6b6b;">*</span>
-                        </label>
-                        <input type="text" name="ten" required
-                               placeholder="Nhập tên sản phẩm"
-                               style="width: 100%; padding: 10px 15px; border: 1px solid #ddd; border-radius: 6px; font-size: 14px;">
+    <form th:action="@{/admin/san-pham/them}" method="post" id="productForm">
+        <div style="display: grid; grid-template-columns: 1fr 400px; gap: 25px;">
+            <!-- Left Column -->
+            <div>
+                <!-- Basic Info Card -->
+                <div style="background: white; border-radius: 12px; box-shadow: 0 2px 8px rgba(0,0,0,0.06); margin-bottom: 20px;">
+                    <div style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; padding: 15px 20px; border-radius: 12px 12px 0 0;">
+                        <h3 style="font-size: 16px; margin: 0;">
+                            <i class="fas fa-info-circle"></i> Thông tin cơ bản
+                        </h3>
                     </div>
-
-                    <div style="margin-bottom: 20px;">
-                        <label style="display: block; margin-bottom: 8px; font-weight: 500; color: #333;">
-                            Mã SKU
-                        </label>
-                        <input type="text" name="maSku"
-                               placeholder="Mã sản phẩm (tùy chọn)"
-                               style="width: 100%; padding: 10px 15px; border: 1px solid #ddd; border-radius: 6px; font-size: 14px;">
-                    </div>
-
-                    <div style="margin-bottom: 20px;">
-                        <label style="display: block; margin-bottom: 8px; font-weight: 500; color: #333;">
-                            Mô tả
-                        </label>
-                        <textarea name="moTa" rows="5"
-                                  placeholder="Mô tả chi tiết về sản phẩm..."
-                                  style="width: 100%; padding: 10px 15px; border: 1px solid #ddd; border-radius: 6px; font-size: 14px; resize: vertical;"></textarea>
-                    </div>
-
-                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-bottom: 20px;">
-                        <div>
-                            <label style="display: block; margin-bottom: 8px; font-weight: 500; color: #333;">
-                                Giá (₫) <span style="color: #ff6b6b;">*</span>
+                    <div style="padding: 25px;">
+                        <!-- Product Name -->
+                        <div style="margin-bottom: 20px;">
+                            <label style="display: block; margin-bottom: 8px; font-weight: 600; color: #333;">
+                                <i class="fas fa-tag"></i> Tên sản phẩm <span style="color: #ff6b6b;">*</span>
                             </label>
-                            <input type="number" name="gia" required min="0" step="1000"
-                                   placeholder="30000"
-                                   style="width: 100%; padding: 10px 15px; border: 1px solid #ddd; border-radius: 6px; font-size: 14px;">
+                            <input type="text" name="ten" required placeholder="Nhập tên sản phẩm"
+                                   style="width: 100%; padding: 12px 15px; border: 2px solid #e0e0e0; border-radius: 8px;">
                         </div>
 
-                        <div>
-                            <label style="display: block; margin-bottom: 8px; font-weight: 500; color: #333;">
-                                Số lượng tồn <span style="color: #ff6b6b;">*</span>
+                        <!-- SKU -->
+                        <div style="margin-bottom: 20px;">
+                            <label style="display: block; margin-bottom: 8px; font-weight: 600; color: #333;">
+                                <i class="fas fa-barcode"></i> Mã SKU
                             </label>
-                            <input type="number" name="soLuongTon" required min="0"
-                                   placeholder="100"
-                                   style="width: 100%; padding: 10px 15px; border: 1px solid #ddd; border-radius: 6px; font-size: 14px;">
+                            <input type="text" name="maSku" placeholder="VD: IPM005"
+                                   style="width: 100%; padding: 12px 15px; border: 2px solid #e0e0e0; border-radius: 8px;">
                         </div>
-                    </div>
 
-                    <!-- Danh mục - Checkbox nhiều lựa chọn -->
-                    <div style="margin-bottom: 20px;">
-                        <label style="display: block; margin-bottom: 12px; font-weight: 500; color: #333;">
-                            Danh mục
-                        </label>
-                        <div style="border: 1px solid #ddd; border-radius: 6px; padding: 15px; max-height: 200px; overflow-y: auto;">
-                            <div th:each="dm : ${danhMucList}" style="margin-bottom: 10px;">
-                                <label style="display: flex; align-items: center; cursor: pointer;">
-                                    <input type="checkbox" name="danhMucIds" th:value="${dm.id}"
-                                           style="margin-right: 8px; width: 16px; height: 16px;">
-                                    <span th:text="${dm.ten}">Danh mục</span>
+                        <!-- Price & Stock -->
+                        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-bottom: 20px;">
+                            <div>
+                                <label style="display: block; margin-bottom: 8px; font-weight: 600; color: #333;">
+                                    <i class="fas fa-money-bill-wave"></i> Giá (₫) <span style="color: #ff6b6b;">*</span>
                                 </label>
+                                <input type="number" name="gia" required min="0" step="1000" placeholder="90000"
+                                       style="width: 100%; padding: 12px 15px; border: 2px solid #e0e0e0; border-radius: 8px;">
+                            </div>
+                            <div>
+                                <label style="display: block; margin-bottom: 8px; font-weight: 600; color: #333;">
+                                    <i class="fas fa-boxes"></i> Tồn kho <span style="color: #ff6b6b;">*</span>
+                                </label>
+                                <input type="number" name="soLuongTon" required min="0" placeholder="100"
+                                       style="width: 100%; padding: 12px 15px; border: 2px solid #e0e0e0; border-radius: 8px;">
                             </div>
                         </div>
-                        <small style="color: #999; font-size: 12px;">Có thể chọn nhiều danh mục</small>
-                    </div>
 
-                    <h3 style="margin: 30px 0 20px; color: #333;">Thông tin chi tiết</h3>
-
-                    <div style="margin-bottom: 20px;">
-                        <label style="display: block; margin-bottom: 8px; font-weight: 500; color: #333;">
-                            Nhà xuất bản
-                        </label>
-                        <input type="text" name="nhaXuatBan"
-                               placeholder="Kim Đồng"
-                               style="width: 100%; padding: 10px 15px; border: 1px solid #ddd; border-radius: 6px; font-size: 14px;">
-                    </div>
-
-                    <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 15px; margin-bottom: 20px;">
-                        <div>
-                            <label style="display: block; margin-bottom: 8px; font-weight: 500; color: #333;">
-                                Năm xuất bản
+                        <!-- Category with Hierarchy -->
+                        <div style="margin-bottom: 20px;">
+                            <label style="display: block; margin-bottom: 8px; font-weight: 600; color: #333;">
+                                <i class="fas fa-folder"></i> Danh mục <span style="color: #ff6b6b;">*</span>
+                                <span style="color: #667eea; font-weight: 400; font-size: 12px;">(chọn danh mục cha và con)</span>
                             </label>
-                            <input type="number" name="namXuatBan" min="1900" max="2100"
-                                   placeholder="2024"
-                                   style="width: 100%; padding: 10px 15px; border: 1px solid #ddd; border-radius: 6px; font-size: 14px;">
+
+                            <div style="border: 2px solid #e0e0e0; border-radius: 8px; padding: 15px; background: #f8f9fa; max-height: 400px; overflow-y: auto;">
+                                <!-- Render danh mục theo cấu trúc cha-con -->
+                                <div th:each="parentDm : ${danhMucList}" th:if="${parentDm.danhMucChaId == null}">
+                                    <!-- Danh mục cha -->
+                                    <div style="margin-bottom: 15px;">
+                                        <label style="display: flex; align-items: center; padding: 10px; background: white; border-radius: 6px; cursor: pointer; font-weight: 600;"
+                                               onmouseover="this.style.background='#e3f2fd'"
+                                               onmouseout="this.style.background='white'">
+                                            <input type="checkbox"
+                                                   name="danhMucIds"
+                                                   th:value="${parentDm.id}"
+                                                   th:data-parent="true"
+                                                   onchange="handleParentChange(this)"
+                                                   style="width: 18px; height: 18px; margin-right: 10px; cursor: pointer;">
+                                            <i class="fas fa-folder" style="margin-right: 8px; color: #667eea;"></i>
+                                            <span th:text="${parentDm.ten}">Danh mục cha</span>
+                                        </label>
+
+                                        <!-- Danh mục con -->
+                                        <div th:if="${parentDm.danhMucCons != null and !parentDm.danhMucCons.isEmpty()}"
+                                             style="margin-left: 35px; margin-top: 8px;">
+                                            <div th:each="childDm : ${parentDm.danhMucCons}" style="margin-bottom: 5px;">
+                                                <label style="display: flex; align-items: center; padding: 8px 12px; border-radius: 4px; cursor: pointer;"
+                                                       onmouseover="this.style.background='#f5f5f5'"
+                                                       onmouseout="this.style.background='transparent'">
+                                                    <input type="checkbox"
+                                                           name="danhMucIds"
+                                                           th:value="${childDm.id}"
+                                                           th:data-parent-id="${parentDm.id}"
+                                                           onchange="handleChildChange(this)"
+                                                           style="width: 16px; height: 16px; margin-right: 10px; cursor: pointer;">
+                                                    <i class="fas fa-angle-right" style="margin-right: 8px; color: #999; font-size: 12px;"></i>
+                                                    <span th:text="${childDm.ten}" style="font-size: 14px;">Danh mục con</span>
+                                                </label>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div style="margin-top: 10px; padding: 10px; background: #e3f2fd; border-radius: 6px; font-size: 13px; color: #0277bd;">
+                                <i class="fas fa-info-circle"></i>
+                                <strong>Lưu ý:</strong> Khi chọn danh mục con, danh mục cha sẽ tự động được chọn. Không thể chọn con của nhiều cha khác nhau cùng lúc.
+                            </div>
                         </div>
 
+                        <!-- Description -->
                         <div>
-                            <label style="display: block; margin-bottom: 8px; font-weight: 500; color: #333;">
-                                Số trang
+                            <label style="display: block; margin-bottom: 8px; font-weight: 600; color: #333;">
+                                <i class="fas fa-align-left"></i> Mô tả
                             </label>
-                            <input type="number" name="soTrang" min="1"
-                                   placeholder="200"
-                                   style="width: 100%; padding: 10px 15px; border: 1px solid #ddd; border-radius: 6px; font-size: 14px;">
+                            <textarea name="moTa" rows="5" placeholder="Mô tả chi tiết về sản phẩm..."
+                                      style="width: 100%; padding: 12px 15px; border: 2px solid #e0e0e0; border-radius: 8px; resize: vertical;"></textarea>
                         </div>
-
-                        <div>
-                            <label style="display: block; margin-bottom: 8px; font-weight: 500; color: #333;">
-                                Trọng lượng (g)
-                            </label>
-                            <input type="number" name="trongLuong" min="0" step="0.01"
-                                   placeholder="500"
-                                   style="width: 100%; padding: 10px 15px; border: 1px solid #ddd; border-radius: 6px; font-size: 14px;">
-                        </div>
-                    </div>
-
-                    <div style="margin-bottom: 20px;">
-                        <label style="display: block; margin-bottom: 8px; font-weight: 500; color: #333;">
-                            Ngôn ngữ
-                        </label>
-                        <input type="text" name="ngonNgu"
-                               placeholder="Tiếng Việt"
-                               style="width: 100%; padding: 10px 15px; border: 1px solid #ddd; border-radius: 6px; font-size: 14px;">
                     </div>
                 </div>
 
-                <!-- Right Column -->
-                <div>
-                    <h3 style="margin-bottom: 20px; color: #333;">Hình ảnh</h3>
-
-                    <div style="margin-bottom: 20px;">
-                        <label style="display: block; margin-bottom: 8px; font-weight: 500; color: #333;">
-                            URL hình đại diện
-                        </label>
-                        <input type="url" name="anhDaiDien" id="anhDaiDien"
-                               placeholder="https://example.com/image.jpg"
-                               style="width: 100%; padding: 10px 15px; border: 1px solid #ddd; border-radius: 6px; font-size: 14px;">
-                        <small style="color: #999; font-size: 12px;">Nhập URL hình ảnh từ internet</small>
+                <!-- Publishing Info -->
+                <div style="background: white; border-radius: 12px; box-shadow: 0 2px 8px rgba(0,0,0,0.06);">
+                    <div style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; padding: 15px 20px; border-radius: 12px 12px 0 0;">
+                        <h3 style="font-size: 16px; margin: 0;">
+                            <i class="fas fa-book"></i> Thông tin xuất bản
+                        </h3>
                     </div>
+                    <div style="padding: 25px;">
+                        <div style="margin-bottom: 20px;">
+                            <label style="display: block; margin-bottom: 8px; font-weight: 600; color: #333;">
+                                <i class="fas fa-building"></i> Nhà xuất bản
+                            </label>
+                            <input type="text" name="nhaXuatBan" placeholder="Kim Đồng"
+                                   style="width: 100%; padding: 12px 15px; border: 2px solid #e0e0e0; border-radius: 8px;">
+                        </div>
 
-                    <div id="imagePreview" style="margin-top: 15px; display: none;">
-                        <img id="previewImg" src="" alt="Preview"
-                             style="width: 100%; border-radius: 8px; border: 2px solid #e0e0e0;">
-                    </div>
+                        <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 15px; margin-bottom: 20px;">
+                            <div>
+                                <label style="display: block; margin-bottom: 8px; font-weight: 600; color: #333;">
+                                    <i class="fas fa-calendar-alt"></i> Năm XB
+                                </label>
+                                <input type="number" name="namXuatBan" min="1900" max="2100" placeholder="2024"
+                                       style="width: 100%; padding: 12px 15px; border: 2px solid #e0e0e0; border-radius: 8px;">
+                            </div>
+                            <div>
+                                <label style="display: block; margin-bottom: 8px; font-weight: 600; color: #333;">
+                                    <i class="fas fa-file-alt"></i> Số trang
+                                </label>
+                                <input type="number" name="soTrang" min="1" placeholder="200"
+                                       style="width: 100%; padding: 12px 15px; border: 2px solid #e0e0e0; border-radius: 8px;">
+                            </div>
+                            <div>
+                                <label style="display: block; margin-bottom: 8px; font-weight: 600; color: #333;">
+                                    <i class="fas fa-weight"></i> Trọng lượng (g)
+                                </label>
+                                <input type="number" name="trongLuong" min="0" step="0.01" placeholder="500"
+                                       style="width: 100%; padding: 12px 15px; border: 2px solid #e0e0e0; border-radius: 8px;">
+                            </div>
+                        </div>
 
-                    <div style="padding: 15px; background: #f8f9fa; border-radius: 6px; margin-top: 20px;">
-                        <p style="font-size: 13px; color: #666; margin-bottom: 10px;">
-                            <strong>Hướng dẫn:</strong>
-                        </p>
-                        <ul style="font-size: 13px; color: #666; padding-left: 20px;">
-                            <li>Upload ảnh lên trang như imgur.com</li>
-                            <li>Copy URL ảnh và dán vào ô trên</li>
-                            <li>Kích thước đề xuất: 300x400px</li>
-                        </ul>
+                        <div>
+                            <label style="display: block; margin-bottom: 8px; font-weight: 600; color: #333;">
+                                <i class="fas fa-language"></i> Ngôn ngữ
+                            </label>
+                            <select name="ngonNgu" style="width: 100%; padding: 12px 15px; border: 2px solid #e0e0e0; border-radius: 8px;">
+                                <option value="">-- Chọn --</option>
+                                <option value="Tiếng Việt">Tiếng Việt</option>
+                                <option value="Tiếng Anh">Tiếng Anh</option>
+                                <option value="Tiếng Nhật">Tiếng Nhật</option>
+                                <option value="Tiếng Hàn">Tiếng Hàn</option>
+                            </select>
+                        </div>
                     </div>
                 </div>
             </div>
 
-            <!-- Actions -->
-            <div style="margin-top: 30px; padding-top: 20px; border-top: 2px solid #f0f0f0; display: flex; gap: 10px; justify-content: flex-end;">
-                <a href="/admin/san-pham" class="btn btn-secondary">
-                    <i class="fas fa-times"></i> Hủy
-                </a>
-                <button type="submit" class="btn btn-success">
-                    <i class="fas fa-save"></i> Lưu sản phẩm
-                </button>
+            <!-- Right Column - Image -->
+            <div>
+                <div style="background: white; border-radius: 12px; box-shadow: 0 2px 8px rgba(0,0,0,0.06);">
+                    <div style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; padding: 15px 20px; border-radius: 12px 12px 0 0;">
+                        <h3 style="font-size: 16px; margin: 0;">
+                            <i class="fas fa-image"></i> Hình ảnh sản phẩm
+                        </h3>
+                    </div>
+                    <div style="padding: 20px;">
+                        <!-- Hidden input chứa URL ảnh -->
+                        <input type="hidden" name="anhDaiDien" id="anhDaiDien">
+
+                        <!-- Tab Navigation -->
+                        <div style="display: flex; gap: 10px; margin-bottom: 20px; border-bottom: 2px solid #f0f0f0;">
+                            <button type="button"
+                                    id="tab-upload"
+                                    onclick="switchTab('upload')"
+                                    style="flex: 1; padding: 12px; background: none; border: none; border-bottom: 3px solid #667eea; color: #667eea; font-weight: 600; cursor: pointer;">
+                                <i class="fas fa-upload"></i> Upload
+                            </button>
+                            <button type="button"
+                                    id="tab-gallery"
+                                    onclick="switchTab('gallery')"
+                                    style="flex: 1; padding: 12px; background: none; border: none; border-bottom: 3px solid transparent; color: #999; font-weight: 600; cursor: pointer;">
+                                <i class="fas fa-images"></i> Thư viện
+                            </button>
+                        </div>
+
+                        <!-- Upload Tab -->
+                        <div id="uploadTab" style="display: block;">
+                            <div id="uploadArea"
+                                 style="border: 2px dashed #667eea; border-radius: 8px; padding: 30px; text-align: center; background: #f8f9fa; cursor: pointer;"
+                                 onclick="document.getElementById('fileInput').click()">
+                                <i class="fas fa-cloud-upload-alt" style="font-size: 48px; color: #667eea; margin-bottom: 15px;"></i>
+                                <p style="color: #333; font-weight: 600; margin-bottom: 8px;">Chọn ảnh từ máy tính</p>
+                                <p style="color: #999; font-size: 13px;">hoặc kéo thả file vào đây</p>
+                                <input type="file"
+                                       id="fileInput"
+                                       accept="image/*"
+                                       style="display: none;"
+                                       onchange="uploadImage(this)">
+                            </div>
+
+                            <!-- Upload Progress -->
+                            <div id="uploadProgress" style="display: none; margin-top: 15px;">
+                                <div style="background: #e0e0e0; border-radius: 10px; height: 8px; overflow: hidden;">
+                                    <div id="progressBar" style="background: linear-gradient(90deg, #667eea 0%, #764ba2 100%); height: 100%; width: 0%; transition: width 0.3s;"></div>
+                                </div>
+                                <p id="uploadStatus" style="text-align: center; margin-top: 10px; color: #667eea; font-size: 13px;">Đang upload...</p>
+                            </div>
+                        </div>
+
+                        <!-- Gallery Tab -->
+                        <div id="galleryTab" style="display: none;">
+                            <div id="galleryLoading" style="text-align: center; padding: 40px; color: #999;">
+                                <i class="fas fa-spinner fa-spin" style="font-size: 32px; margin-bottom: 10px;"></i>
+                                <p>Đang tải ảnh...</p>
+                            </div>
+                            <div id="galleryContent" style="display: none; max-height: 400px; overflow-y: auto;"></div>
+                            <div id="galleryEmpty" style="display: none; text-align: center; padding: 40px; color: #999;">
+                                <i class="fas fa-images" style="font-size: 48px; margin-bottom: 10px;"></i>
+                                <p>Chưa có ảnh trong thư viện</p>
+                            </div>
+                        </div>
+
+                        <!-- Image Preview -->
+                        <div style="margin-top: 20px;">
+                            <label style="display: block; margin-bottom: 8px; font-weight: 600; color: #333;">
+                                <i class="fas fa-eye"></i> Xem trước
+                            </label>
+                            <div id="imagePreview" style="display: none; position: relative; border-radius: 10px; overflow: hidden; border: 2px solid #e0e0e0;">
+                                <img id="previewImg" src="" alt="Preview" style="width: 100%; display: block;">
+                                <button type="button"
+                                        onclick="removeImage()"
+                                        style="position: absolute; top: 10px; right: 10px; background: rgba(255,107,107,0.9); color: white; border: none; border-radius: 50%; width: 32px; height: 32px; cursor: pointer;">
+                                    <i class="fas fa-times"></i>
+                                </button>
+                            </div>
+                            <div id="noImagePreview"
+                                 style="height: 300px; background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%); border-radius: 10px; display: flex; flex-direction: column; align-items: center; justify-content: center; color: #999;">
+                                <i class="fas fa-image" style="font-size: 60px; margin-bottom: 10px;"></i>
+                                <p>Chưa có hình ảnh</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Action Buttons -->
+                <div style="margin-top: 20px; display: flex; flex-direction: column; gap: 10px;">
+                    <button type="submit"
+                            style="width: 100%; padding: 14px; background: linear-gradient(135deg, #4caf50 0%, #66bb6a 100%); color: white; border: none; border-radius: 8px; font-size: 15px; font-weight: 600; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 8px;">
+                        <i class="fas fa-plus"></i> Thêm sản phẩm
+                    </button>
+                    <a href="/admin/san-pham"
+                       style="width: 100%; padding: 14px; background: #f5f7fa; color: #666; border-radius: 8px; font-size: 15px; font-weight: 600; display: flex; align-items: center; justify-content: center; gap: 8px; text-decoration: none;">
+                        <i class="fas fa-times"></i> Hủy
+                    </a>
+                </div>
             </div>
-        </form>
-    </div>
+        </div>
+    </form>
 </main>
 
 <script>
-    // Preview image
-    document.getElementById('anhDaiDien').addEventListener('input', function() {
-        const url = this.value;
-        const preview = document.getElementById('imagePreview');
-        const img = document.getElementById('previewImg');
+    // Category Logic - Same as Edit Form
+    function handleParentChange(parentCheckbox) {
+        const parentId = parentCheckbox.value;
+        const isChecked = parentCheckbox.checked;
 
-        if (url) {
-            img.src = url;
-            preview.style.display = 'block';
+        if (!isChecked) {
+            const children = document.querySelectorAll(`input[data-parent-id="${parentId}"]`);
+            children.forEach(child => child.checked = false);
+        }
+    }
 
-            img.onerror = function() {
-                preview.style.display = 'none';
-            };
+    function handleChildChange(childCheckbox) {
+        const parentId = childCheckbox.getAttribute('data-parent-id');
+        const isChecked = childCheckbox.checked;
+
+        if (isChecked) {
+            const parentCheckbox = document.querySelector(`input[value="${parentId}"][data-parent="true"]`);
+            if (parentCheckbox) parentCheckbox.checked = true;
+
+            const allChildren = document.querySelectorAll('input[data-parent-id]');
+            allChildren.forEach(child => {
+                const childParentId = child.getAttribute('data-parent-id');
+                if (childParentId !== parentId && child.checked) {
+                    child.checked = false;
+                }
+            });
+
+            const allParents = document.querySelectorAll('input[data-parent="true"]');
+            allParents.forEach(parent => {
+                if (parent.value !== parentId && parent.checked) {
+                    parent.checked = false;
+                }
+            });
+        }
+    }
+
+    // Form Validation
+    document.getElementById('productForm').addEventListener('submit', function(e) {
+        const checkedCategories = document.querySelectorAll('input[name="danhMucIds"]:checked');
+
+        if (checkedCategories.length === 0) {
+            e.preventDefault();
+            alert('⚠️ Vui lòng chọn ít nhất một danh mục!');
+            return false;
+        }
+
+        const parentIds = new Set();
+        checkedCategories.forEach(checkbox => {
+            const parentId = checkbox.getAttribute('data-parent-id');
+            if (parentId) parentIds.add(parentId);
+        });
+
+        if (parentIds.size > 1) {
+            e.preventDefault();
+            alert('⚠️ Không thể chọn danh mục con của nhiều danh mục cha khác nhau!');
+            return false;
+        }
+
+        return true;
+    });
+
+    // Image Upload Logic
+    function switchTab(tab) {
+        const uploadTab = document.getElementById('uploadTab');
+        const galleryTab = document.getElementById('galleryTab');
+        const tabUpload = document.getElementById('tab-upload');
+        const tabGallery = document.getElementById('tab-gallery');
+
+        if (tab === 'upload') {
+            uploadTab.style.display = 'block';
+            galleryTab.style.display = 'none';
+            tabUpload.style.borderBottomColor = '#667eea';
+            tabUpload.style.color = '#667eea';
+            tabGallery.style.borderBottomColor = 'transparent';
+            tabGallery.style.color = '#999';
         } else {
-            preview.style.display = 'none';
+            uploadTab.style.display = 'none';
+            galleryTab.style.display = 'block';
+            tabUpload.style.borderBottomColor = 'transparent';
+            tabUpload.style.color = '#999';
+            tabGallery.style.borderBottomColor = '#667eea';
+            tabGallery.style.color = '#667eea';
+            loadGallery();
+        }
+    }
+
+    function uploadImage(input) {
+        const file = input.files[0];
+        if (!file) return;
+
+        document.getElementById('uploadProgress').style.display = 'block';
+        document.getElementById('progressBar').style.width = '30%';
+
+        const formData = new FormData();
+        formData.append('file', file);
+
+        fetch('/admin/upload/image', {
+            method: 'POST',
+            body: formData
+        })
+        .then(response => response.json())
+        .then(data => {
+            document.getElementById('progressBar').style.width = '100%';
+
+            if (data.success) {
+                document.getElementById('uploadStatus').textContent = 'Upload thành công!';
+                document.getElementById('uploadStatus').style.color = '#4caf50';
+                updatePreview(data.url);
+
+                setTimeout(() => {
+                    document.getElementById('uploadProgress').style.display = 'none';
+                    document.getElementById('progressBar').style.width = '0%';
+                    document.getElementById('uploadStatus').textContent = 'Đang upload...';
+                    document.getElementById('uploadStatus').style.color = '#667eea';
+                }, 1000);
+            } else {
+                alert('Lỗi: ' + data.message);
+                document.getElementById('uploadProgress').style.display = 'none';
+            }
+        })
+        .catch(error => {
+            alert('Lỗi khi upload: ' + error.message);
+            document.getElementById('uploadProgress').style.display = 'none';
+        });
+    }
+
+    function loadGallery() {
+        const loading = document.getElementById('galleryLoading');
+        const content = document.getElementById('galleryContent');
+        const empty = document.getElementById('galleryEmpty');
+
+        loading.style.display = 'block';
+        content.style.display = 'none';
+        empty.style.display = 'none';
+
+        fetch('/admin/images/list')
+            .then(response => response.json())
+            .then(data => {
+                loading.style.display = 'none';
+
+                if (data.success && data.images && data.images.length > 0) {
+                    content.style.display = 'block';
+                    content.innerHTML = '<div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px;"></div>';
+
+                    const grid = content.firstChild;
+                    data.images.forEach(url => {
+                        const item = document.createElement('div');
+                        item.className = 'gallery-item';
+                        item.onclick = () => selectImage(url, item);
+                        item.style.cssText = 'aspect-ratio: 3/4; border-radius: 8px; overflow: hidden; cursor: pointer; border: 3px solid transparent; transition: all 0.3s;';
+                        item.innerHTML = `<img src="${url}" style="width: 100%; height: 100%; object-fit: cover;">`;
+                        grid.appendChild(item);
+                    });
+                } else {
+                    empty.style.display = 'block';
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                loading.style.display = 'none';
+                empty.style.display = 'block';
+            });
+    }
+
+    function selectImage(url, element) {
+        updatePreview(url);
+        document.querySelectorAll('.gallery-item').forEach(item => {
+            item.style.borderColor = 'transparent';
+        });
+        element.style.borderColor = '#667eea';
+    }
+
+    function updatePreview(url) {
+        document.getElementById('anhDaiDien').value = url;
+        document.getElementById('previewImg').src = url;
+        document.getElementById('imagePreview').style.display = 'block';
+        document.getElementById('noImagePreview').style.display = 'none';
+    }
+
+    function removeImage() {
+        if (confirm('Bạn có chắc muốn xóa ảnh này?')) {
+            document.getElementById('anhDaiDien').value = '';
+            document.getElementById('imagePreview').style.display = 'none';
+            document.getElementById('noImagePreview').style.display = 'flex';
+        }
+    }
+
+    // Drag & Drop
+    const uploadArea = document.getElementById('uploadArea');
+    uploadArea.addEventListener('dragover', (e) => {
+        e.preventDefault();
+        uploadArea.style.background = '#e3f2fd';
+        uploadArea.style.borderColor = '#2196f3';
+    });
+    uploadArea.addEventListener('dragleave', () => {
+        uploadArea.style.background = '#f8f9fa';
+        uploadArea.style.borderColor = '#667eea';
+    });
+    uploadArea.addEventListener('drop', (e) => {
+        e.preventDefault();
+        uploadArea.style.background = '#f8f9fa';
+        uploadArea.style.borderColor = '#667eea';
+
+        const file = e.dataTransfer.files[0];
+        if (file && file.type.startsWith('image/')) {
+            const fileInput = document.getElementById('fileInput');
+            const dataTransfer = new DataTransfer();
+            dataTransfer.items.add(file);
+            fileInput.files = dataTransfer.files;
+            uploadImage(fileInput);
+        } else {
+            alert('Vui lòng chọn file ảnh!');
         }
     });
 </script>
