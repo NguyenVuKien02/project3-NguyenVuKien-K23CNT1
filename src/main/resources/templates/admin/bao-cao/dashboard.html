@@ -1,0 +1,238 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head th:replace="admin/admin-layout :: head('Báo cáo thống kê')"></head>
+<body>
+<aside th:replace="admin/admin-layout :: sidebar('bao-cao')"></aside>
+
+<main class="main-content">
+    <div th:replace="admin/admin-layout :: header('Báo cáo thống kê', 'fas fa-chart-line')"></div>
+
+    <!-- Time Range Filter -->
+    <div class="content-section" style="margin-bottom: 20px;">
+        <div style="display: flex; gap: 8px;">
+            <a th:href="@{/admin/bao-cao(timeRange='7days')}" class="filter-btn"
+               th:classappend="${timeRange == '7days'} ? 'active' : ''">
+                7 ngày
+            </a>
+            <a th:href="@{/admin/bao-cao(timeRange='30days')}" class="filter-btn"
+               th:classappend="${timeRange == '30days' || timeRange == null} ? 'active' : ''">
+                30 ngày
+            </a>
+            <a th:href="@{/admin/bao-cao(timeRange='90days')}" class="filter-btn"
+               th:classappend="${timeRange == '90days'} ? 'active' : ''">
+                90 ngày
+            </a>
+            <a th:href="@{/admin/bao-cao(timeRange='1year')}" class="filter-btn"
+               th:classappend="${timeRange == '1year'} ? 'active' : ''">
+                1 năm
+            </a>
+        </div>
+    </div>
+
+    <!-- Statistics Overview Cards -->
+    <div style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 15px; margin-bottom: 25px;">
+        <!-- Tổng đơn hàng -->
+        <div style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; padding: 20px; border-radius: 12px;">
+            <div style="display: flex; justify-content: space-between; align-items: center;">
+                <div>
+                    <div style="font-size: 13px; opacity: 0.9; margin-bottom: 8px;">Tổng đơn hàng</div>
+                    <div style="font-size: 32px; font-weight: 700;" th:text="${totalOrders}">0</div>
+                </div>
+                <i class="fas fa-shopping-cart" style="font-size: 40px; opacity: 0.3;"></i>
+            </div>
+        </div>
+
+        <!-- Tổng sản phẩm -->
+        <div style="background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%); color: white; padding: 20px; border-radius: 12px;">
+            <div style="display: flex; justify-content: space-between; align-items: center;">
+                <div>
+                    <div style="font-size: 13px; opacity: 0.9; margin-bottom: 8px;">Tổng sản phẩm</div>
+                    <div style="font-size: 32px; font-weight: 700;" th:text="${totalProducts}">0</div>
+                </div>
+                <i class="fas fa-box" style="font-size: 40px; opacity: 0.3;"></i>
+            </div>
+        </div>
+
+        <!-- Tổng người dùng -->
+        <div style="background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%); color: white; padding: 20px; border-radius: 12px;">
+            <div style="display: flex; justify-content: space-between; align-items: center;">
+                <div>
+                    <div style="font-size: 13px; opacity: 0.9; margin-bottom: 8px;">Tổng người dùng</div>
+                    <div style="font-size: 32px; font-weight: 700;" th:text="${totalUsers}">0</div>
+                </div>
+                <i class="fas fa-users" style="font-size: 40px; opacity: 0.3;"></i>
+            </div>
+        </div>
+
+        <!-- Tổng doanh thu -->
+        <div style="background: linear-gradient(135deg, #43e97b 0%, #38f9d7 100%); color: white; padding: 20px; border-radius: 12px;">
+            <div style="display: flex; justify-content: space-between; align-items: center;">
+                <div>
+                    <div style="font-size: 13px; opacity: 0.9; margin-bottom: 8px;">Tổng doanh thu</div>
+                    <div style="font-size: 28px; font-weight: 700;">
+                        <span th:text="${#numbers.formatDecimal(totalRevenue, 0, 'COMMA', 0, 'POINT')}">0</span>₫
+                    </div>
+                </div>
+                <i class="fas fa-dollar-sign" style="font-size: 40px; opacity: 0.3;"></i>
+            </div>
+        </div>
+    </div>
+
+    <!-- Order Status Cards -->
+    <div style="display: grid; grid-template-columns: repeat(5, 1fr); gap: 15px; margin-bottom: 25px;">
+        <div style="background: white; padding: 18px; border-radius: 10px; box-shadow: 0 2px 8px rgba(0,0,0,0.06); border-left: 4px solid #ff9800;">
+            <div style="font-size: 13px; color: #999; margin-bottom: 5px;">Chờ xác nhận</div>
+            <div style="font-size: 24px; font-weight: 700; color: #ff9800;" th:text="${ordersPending}">0</div>
+        </div>
+        <div style="background: white; padding: 18px; border-radius: 10px; box-shadow: 0 2px 8px rgba(0,0,0,0.06); border-left: 4px solid #2196f3;">
+            <div style="font-size: 13px; color: #999; margin-bottom: 5px;">Đang xử lý</div>
+            <div style="font-size: 24px; font-weight: 700; color: #2196f3;" th:text="${ordersProcessing}">0</div>
+        </div>
+        <div style="background: white; padding: 18px; border-radius: 10px; box-shadow: 0 2px 8px rgba(0,0,0,0.06); border-left: 4px solid #9c27b0;">
+            <div style="font-size: 13px; color: #999; margin-bottom: 5px;">Đang giao</div>
+            <div style="font-size: 24px; font-weight: 700; color: #9c27b0;" th:text="${ordersShipping}">0</div>
+        </div>
+        <div style="background: white; padding: 18px; border-radius: 10px; box-shadow: 0 2px 8px rgba(0,0,0,0.06); border-left: 4px solid #4caf50;">
+            <div style="font-size: 13px; color: #999; margin-bottom: 5px;">Đã giao</div>
+            <div style="font-size: 24px; font-weight: 700; color: #4caf50;" th:text="${ordersCompleted}">0</div>
+        </div>
+        <div style="background: white; padding: 18px; border-radius: 10px; box-shadow: 0 2px 8px rgba(0,0,0,0.06); border-left: 4px solid #f44336;">
+            <div style="font-size: 13px; color: #999; margin-bottom: 5px;">Đã hủy</div>
+            <div style="font-size: 24px; font-weight: 700; color: #f44336;" th:text="${ordersCancelled}">0</div>
+        </div>
+    </div>
+
+    <!-- Charts Row -->
+    <div style="display: grid; grid-template-columns: 2fr 1fr; gap: 20px; margin-bottom: 25px;">
+        <!-- Revenue Chart -->
+        <div class="content-section">
+            <h3 style="margin: 0 0 20px 0; font-size: 18px; color: #333;">
+                <i class="fas fa-chart-line"></i>
+                <span th:switch="${timeRange}">
+        <span th:case="'7days'">Doanh thu 7 ngày gần đây</span>
+        <span th:case="'30days'">Doanh thu 30 ngày gần đây</span>
+        <span th:case="'90days'">Doanh thu 90 ngày gần đây</span>
+        <span th:case="'1year'">Doanh thu 1 năm gần đây</span>
+        <span th:case="*">Doanh thu 30 ngày gần đây</span>
+    </span>
+            </h3>
+
+            <canvas id="revenueChart" style="max-height: 300px;"></canvas>
+        </div>
+
+        <!-- Status Pie Chart -->
+        <div class="content-section">
+            <h3 style="margin: 0 0 20px 0; font-size: 18px; color: #333;">
+                <i class="fas fa-chart-pie"></i> Trạng thái đơn hàng
+            </h3>
+            <canvas id="statusChart" style="max-height: 300px;"></canvas>
+        </div>
+    </div>
+
+</main>
+
+<!-- Chart.js -->
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+<script th:inline="javascript">
+    // Revenue Chart Data
+    const revenueData = /*[[${revenueByDay}]]*/ {};
+    const revenueLabels = Object.keys(revenueData);
+    const revenueValues = Object.values(revenueData);
+
+    // Revenue Chart
+    const revenueCtx = document.getElementById('revenueChart').getContext('2d');
+    new Chart(revenueCtx, {
+        type: 'line',
+        data: {
+            labels: revenueLabels,
+            datasets: [{
+                label: 'Doanh thu (₫)',
+                data: revenueValues,
+                borderColor: 'rgb(102, 126, 234)',
+                backgroundColor: 'rgba(102, 126, 234, 0.1)',
+                tension: 0.4,
+                fill: true,
+                pointRadius: 5,
+                pointHoverRadius: 7
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+                legend: {
+                    display: false
+                }
+            },
+            scales: {
+                y: {
+                    beginAtZero: true,
+                    ticks: {
+                        callback: function(value) {
+                            return value.toLocaleString('vi-VN') + '₫';
+                        }
+                    }
+                }
+            }
+        }
+    });
+
+    // Status Chart Data
+    const statusData = /*[[${ordersByStatus}]]*/ {};
+    const statusLabels = Object.keys(statusData);
+    const statusValues = Object.values(statusData);
+
+    // Status Pie Chart
+    const statusCtx = document.getElementById('statusChart').getContext('2d');
+    new Chart(statusCtx, {
+        type: 'doughnut',
+        data: {
+            labels: statusLabels,
+            datasets: [{
+                data: statusValues,
+                backgroundColor: [
+                    '#ff9800',
+                    '#2196f3',
+                    '#9c27b0',
+                    '#4caf50',
+                    '#f44336'
+                ]
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+                legend: {
+                    position: 'bottom'
+                }
+            }
+        }
+    });
+</script>
+
+<style>
+    .filter-btn {
+        padding: 10px 20px;
+        background: white;
+        border: 2px solid #e0e0e0;
+        border-radius: 8px;
+        color: #666;
+        text-decoration: none;
+        font-size: 14px;
+        font-weight: 600;
+        transition: all 0.3s;
+    }
+    .filter-btn:hover {
+        border-color: #667eea;
+        color: #667eea;
+    }
+    .filter-btn.active {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+        border-color: #667eea;
+    }
+</style>
+</body>
+</html>

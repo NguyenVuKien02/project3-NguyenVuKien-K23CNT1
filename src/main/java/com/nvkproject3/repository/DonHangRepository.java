@@ -46,4 +46,22 @@ public interface DonHangRepository extends JpaRepository<DonHang, Integer> {
 
     // Lấy đơn hàng mới nhất
     List<DonHang> findTop10ByOrderByNgayDatDesc();
+
+    // ============ THÊM CÁC METHOD CHO ADMIN ============
+
+    // Tìm kiếm đơn hàng theo mã đơn hoặc SĐT
+    @Query("SELECT dh FROM DonHang dh WHERE " +
+            "dh.maDonHang LIKE %:keyword% OR " +
+            "dh.sdtNguoiNhan LIKE %:keyword%")
+    Page<DonHang> search(@Param("keyword") String keyword, Pageable pageable);
+
+    // Tìm kiếm đơn hàng theo keyword và trạng thái
+    @Query("SELECT dh FROM DonHang dh WHERE " +
+            "(dh.maDonHang LIKE %:keyword% OR dh.sdtNguoiNhan LIKE %:keyword%) " +
+            "AND dh.trangThai = :trangThai")
+    Page<DonHang> searchByStatus(
+            @Param("keyword") String keyword,
+            @Param("trangThai") DonHang.TrangThai trangThai,
+            Pageable pageable
+    );
 }

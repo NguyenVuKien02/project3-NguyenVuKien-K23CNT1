@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head th:replace="admin/admin-layout :: head('Thêm người dùng')"></head>
+<body>
+<aside th:replace="admin/admin-layout :: sidebar('nguoi-dung')"></aside>
+
+<main class="main-content">
+    <div th:replace="admin/admin-layout :: header('Thêm người dùng', 'fas fa-user-plus')"></div>
+
+    <!-- Breadcrumb -->
+    <div style="display: flex; align-items: center; gap: 10px; padding: 15px 0; font-size: 14px; color: #666; margin-bottom: 20px;">
+        <a href="/admin/dashboard" style="color: #667eea; text-decoration: none;"><i class="fas fa-home"></i> Dashboard</a>
+        <i class="fas fa-chevron-right" style="font-size: 10px; color: #ccc;"></i>
+        <a href="/admin/nguoi-dung" style="color: #667eea; text-decoration: none;">Người dùng</a>
+        <i class="fas fa-chevron-right" style="font-size: 10px; color: #ccc;"></i>
+        <span>Thêm mới</span>
+    </div>
+
+    <!-- Alert -->
+    <div class="alert alert-error" th:if="${error}" style="margin-bottom: 20px;">
+        <i class="fas fa-exclamation-circle"></i> <span th:text="${error}"></span>
+    </div>
+
+    <!-- Form -->
+    <div class="content-section" style="max-width: 800px;">
+        <form th:action="@{/admin/nguoi-dung/them}" method="post">
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px;">
+                <!-- Họ tên -->
+                <div>
+                    <label style="display: block; margin-bottom: 8px; font-weight: 600; color: #333;">
+                        Họ và tên <span style="color: red;">*</span>
+                    </label>
+                    <input type="text" name="hoTen" required
+                           style="width: 100%; padding: 12px; border: 2px solid #e0e0e0; border-radius: 8px;"
+                           placeholder="Nguyễn Văn A">
+                </div>
+
+                <!-- Email -->
+                <div>
+                    <label style="display: block; margin-bottom: 8px; font-weight: 600; color: #333;">
+                        Email <span style="color: red;">*</span>
+                    </label>
+                    <input type="email" name="email" required
+                           style="width: 100%; padding: 12px; border: 2px solid #e0e0e0; border-radius: 8px;"
+                           placeholder="email@example.com">
+                </div>
+
+                <!-- Mật khẩu -->
+                <div>
+                    <label style="display: block; margin-bottom: 8px; font-weight: 600; color: #333;">
+                        Mật khẩu <span style="color: red;">*</span>
+                    </label>
+                    <input type="password" name="matKhau" required
+                           style="width: 100%; padding: 12px; border: 2px solid #e0e0e0; border-radius: 8px;"
+                           placeholder="********">
+                </div>
+
+                <!-- SĐT -->
+                <div>
+                    <label style="display: block; margin-bottom: 8px; font-weight: 600; color: #333;">
+                        Số điện thoại
+                    </label>
+                    <input type="text" name="sdt"
+                           style="width: 100%; padding: 12px; border: 2px solid #e0e0e0; border-radius: 8px;"
+                           placeholder="0123456789">
+                </div>
+
+                <!-- Vai trò -->
+                <div>
+                    <label style="display: block; margin-bottom: 8px; font-weight: 600; color: #333;">
+                        Vai trò <span style="color: red;">*</span>
+                    </label>
+                    <select name="vaiTro" required
+                            style="width: 100%; padding: 12px; border: 2px solid #e0e0e0; border-radius: 8px;">
+                        <option value="khach_hang">Khách hàng</option>
+                        <option value="admin">Admin</option>
+                    </select>
+                </div>
+
+                <!-- Trạng thái -->
+                <div>
+                    <label style="display: block; margin-bottom: 8px; font-weight: 600; color: #333;">
+                        Trạng thái <span style="color: red;">*</span>
+                    </label>
+                    <select name="trangThai" required
+                            style="width: 100%; padding: 12px; border: 2px solid #e0e0e0; border-radius: 8px;">
+                        <option value="active">Hoạt động</option>
+                        <option value="inactive">Vô hiệu hóa</option>
+                    </select>
+                </div>
+
+                <!-- Địa chỉ -->
+                <div style="grid-column: 1 / -1;">
+                    <label style="display: block; margin-bottom: 8px; font-weight: 600; color: #333;">
+                        Địa chỉ
+                    </label>
+                    <textarea name="diaChi" rows="3"
+                              style="width: 100%; padding: 12px; border: 2px solid #e0e0e0; border-radius: 8px; resize: vertical;"
+                              placeholder="Nhập địa chỉ..."></textarea>
+                </div>
+            </div>
+
+            <!-- Buttons -->
+            <div style="display: flex; gap: 10px; margin-top: 25px;">
+                <button type="submit" class="btn btn-primary" style="flex: 1;">
+                    <i class="fas fa-save"></i> Thêm người dùng
+                </button>
+                <a href="/admin/nguoi-dung" class="btn btn-secondary" style="flex: 1; text-align: center;">
+                    <i class="fas fa-times"></i> Hủy
+                </a>
+            </div>
+        </form>
+    </div>
+</main>
+</body>
+</html>

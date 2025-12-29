@@ -17,4 +17,15 @@ public interface DanhMucRepository extends JpaRepository<DanhMuc, Integer> {
 
     // Tìm kiếm theo tên - SỬA: ten KHÔNG phải tenDanhMuc
     List<DanhMuc> findByTenContainingIgnoreCase(String keyword);
+
+    /**
+     * Kiểm tra tên danh mục đã tồn tại
+     */
+    boolean existsByTen(String ten);
+
+    /**
+     * Tìm danh mục theo tên
+     */
+    DanhMuc findByTen(String ten);
+
 }

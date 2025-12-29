@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head th:replace="admin/admin-layout :: head('Quản lý danh mục')"></head>
+<body>
+<aside th:replace="admin/admin-layout :: sidebar('danh-muc')"></aside>
+
+<main class="main-content">
+    <div th:replace="admin/admin-layout :: header('Quản lý danh mục', 'fas fa-folder')"></div>
+
+    <!-- Alert -->
+    <div class="alert alert-success" th:if="${message}" style="margin-bottom: 20px;">
+        <i class="fas fa-check-circle"></i> <span th:text="${message}"></span>
+    </div>
+    <div class="alert alert-error" th:if="${error}" style="margin-bottom: 20px;">
+        <i class="fas fa-exclamation-circle"></i> <span th:text="${error}"></span>
+    </div>
+
+    <!-- Statistics Cards -->
+    <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 15px; margin-bottom: 25px;">
+        <div style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; padding: 20px; border-radius: 10px;">
+            <div style="font-size: 13px; opacity: 0.9; margin-bottom: 8px;">Tổng danh mục</div>
+            <div style="font-size: 28px; font-weight: 700;" th:text="${totalCategories}">0</div>
+        </div>
+        <div style="background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%); color: white; padding: 20px; border-radius: 10px;">
+            <div style="font-size: 13px; opacity: 0.9; margin-bottom: 8px;">Danh mục cha</div>
+            <div style="font-size: 28px; font-weight: 700;" th:text="${parentCategories}">0</div>
+        </div>
+        <div style="background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%); color: white; padding: 20px; border-radius: 10px;">
+            <div style="font-size: 13px; opacity: 0.9; margin-bottom: 8px;">Danh mục con</div>
+            <div style="font-size: 28px; font-weight: 700;" th:text="${childCategories}">0</div>
+        </div>
+    </div>
+
+    <!-- Action Bar -->
+    <div class="content-section" style="margin-bottom: 20px;">
+        <div style="display: flex; justify-content: flex-end;">
+            <a href="/admin/danh-muc/them" class="btn btn-success">
+                <i class="fas fa-plus"></i> Thêm danh mục
+            </a>
+        </div>
+    </div>
+
+    <!-- Categories Table - Hierarchical View -->
+    <div class="content-section">
+        <table style="width: 100%; border-collapse: collapse;">
+            <thead style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white;">
+            <tr>
+                <th style="padding: 14px 10px; text-align: left; width: 80px;">ID</th>
+                <th style="padding: 14px 10px; text-align: left;">Tên danh mục</th>
+                <th style="padding: 14px 10px; text-align: left;">Mô tả</th>
+                <th style="padding: 14px 10px; text-align: center; width: 180px;">Thao tác</th>
+            </tr>
+            </thead>
+            <tbody>
+            <!-- Danh mục cha -->
+            <th:block th:each="dmCha : ${danhMucCha}">
+                <tr style="border-bottom: 1px solid #f0f0f0; background: #f8f9fa;">
+                    <td style="padding: 15px 10px;">
+                        <span style="font-weight: 700; color: #667eea;" th:text="${dmCha.id}">1</span>
+                    </td>
+                    <td style="padding: 15px 10px;">
+                        <div style="display: flex; align-items: center; gap: 10px;">
+                            <i class="fas fa-folder" style="color: #ff9800; font-size: 18px;"></i>
+                            <span style="font-weight: 700; color: #333; font-size: 15px;" th:text="${dmCha.ten}">Danh mục cha</span>
+                        </div>
+                    </td>
+                    <td style="padding: 15px 10px;">
+                        <span style="color: #666; font-size: 14px;" th:text="${dmCha.moTa}">Mô tả danh mục</span>
+                    </td>
+                    <td style="padding: 15px 10px; text-align: center;">
+                        <div style="display: flex; gap: 5px; justify-content: center;">
+                            <a th:href="@{'/admin/danh-muc/sua/' + ${dmCha.id}}"
+                               style="width: 34px; height: 34px; display: inline-flex; align-items: center; justify-content: center; background: #4caf50; color: white; border-radius: 6px; text-decoration: none;"
+                               title="Sửa">
+                                <i class="fas fa-edit"></i>
+                            </a>
+                            <form th:action="@{'/admin/danh-muc/xoa/' + ${dmCha.id}}" method="post"
+                                  onsubmit="return confirm('⚠️ Bạn có chắc muốn xóa danh mục này?')"
+                                  style="display: inline;">
+                                <button type="submit"
+                                        style="width: 34px; height: 34px; display: inline-flex; align-items: center; justify-content: center; background: #f44336; color: white; border-radius: 6px; border: none; cursor: pointer;"
+                                        title="Xóa">
+                                    <i class="fas fa-trash"></i>
+                                </button>
+                            </form>
+                        </div>
+                    </td>
+                </tr>
+
+                <!-- Danh mục con của danh mục cha này -->
+                <th:block th:each="dmCon : ${danhMucList}">
+                    <tr th:if="${dmCon.danhMucChaId != null && dmCon.danhMucChaId == dmCha.id}"
+                        style="border-bottom: 1px solid #f0f0f0;">
+                        <td style="padding: 15px 10px;">
+                            <span style="font-weight: 600; color: #999;" th:text="${dmCon.id}">2</span>
+                        </td>
+                        <td style="padding: 15px 10px;">
+                            <div style="display: flex; align-items: center; gap: 10px; padding-left: 40px;">
+                                <i class="fas fa-folder-open" style="color: #4caf50; font-size: 16px;"></i>
+                                <span style="font-weight: 600; color: #555; font-size: 14px;" th:text="${dmCon.ten}">Danh mục con</span>
+                            </div>
+                        </td>
+                        <td style="padding: 15px 10px;">
+                            <span style="color: #999; font-size: 13px;" th:text="${dmCon.moTa}">Mô tả danh mục con</span>
+                        </td>
+                        <td style="padding: 15px 10px; text-align: center;">
+                            <div style="display: flex; gap: 5px; justify-content: center;">
+                                <a th:href="@{'/admin/danh-muc/sua/' + ${dmCon.id}}"
+                                   style="width: 34px; height: 34px; display: inline-flex; align-items: center; justify-content: center; background: #4caf50; color: white; border-radius: 6px; text-decoration: none;"
+                                   title="Sửa">
+                                    <i class="fas fa-edit"></i>
+                                </a>
+                                <form th:action="@{'/admin/danh-muc/xoa/' + ${dmCon.id}}" method="post"
+                                      onsubmit="return confirm('⚠️ Bạn có chắc muốn xóa danh mục này?')"
+                                      style="display: inline;">
+                                    <button type="submit"
+                                            style="width: 34px; height: 34px; display: inline-flex; align-items: center; justify-content: center; background: #f44336; color: white; border-radius: 6px; border: none; cursor: pointer;"
+                                            title="Xóa">
+                                        <i class="fas fa-trash"></i>
+                                    </button>
+                                </form>
+                            </div>
+                        </td>
+                    </tr>
+                </th:block>
+            </th:block>
+            </tbody>
+        </table>
+
+        <!-- Empty State -->
+        <div th:if="${danhMucList.isEmpty()}" style="text-align: center; padding: 60px 20px; color: #999;">
+            <i class="fas fa-folder-open" style="font-size: 64px; margin-bottom: 20px; opacity: 0.3;"></i>
+            <h3>Chưa có danh mục nào</h3>
+            <p>Hãy thêm danh mục đầu tiên!</p>
+        </div>
+    </div>
+</main>
+</body>
+</html>

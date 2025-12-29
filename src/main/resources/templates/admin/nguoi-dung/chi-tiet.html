@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head th:replace="admin/admin-layout :: head('Chi tiết người dùng')"></head>
+<body>
+<aside th:replace="admin/admin-layout :: sidebar('nguoi-dung')"></aside>
+
+<main class="main-content">
+    <div th:replace="admin/admin-layout :: header('Chi tiết người dùng', 'fas fa-user')"></div>
+
+    <!-- Breadcrumb -->
+    <div style="display: flex; align-items: center; gap: 10px; padding: 15px 0; font-size: 14px; color: #666; margin-bottom: 20px;">
+        <a href="/admin/dashboard" style="color: #667eea; text-decoration: none;"><i class="fas fa-home"></i> Dashboard</a>
+        <i class="fas fa-chevron-right" style="font-size: 10px; color: #ccc;"></i>
+        <a href="/admin/nguoi-dung" style="color: #667eea; text-decoration: none;">Người dùng</a>
+        <i class="fas fa-chevron-right" style="font-size: 10px; color: #ccc;"></i>
+        <span>Chi tiết</span>
+    </div>
+
+    <div style="display: grid; grid-template-columns: 2fr 1fr; gap: 25px;">
+        <!-- Left Column -->
+        <div>
+            <!-- User Info Card -->
+            <div style="background: white; border-radius: 12px; box-shadow: 0 2px 8px rgba(0,0,0,0.06); margin-bottom: 20px;">
+                <div style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; padding: 20px; border-radius: 12px 12px 0 0;">
+                    <div style="display: flex; justify-content: space-between; align-items: center;">
+                        <div>
+                            <h3 style="font-size: 20px; margin: 0 0 5px 0;">
+                                <i class="fas fa-user-circle"></i> <span th:text="${nguoiDung.hoTen}">Nguyễn Văn A</span>
+                            </h3>
+                            <div style="font-size: 13px; opacity: 0.9;">
+                                ID: <span th:text="${nguoiDung.id}">1</span>
+                            </div>
+                        </div>
+                        <th:block th:switch="${nguoiDung.trangThai.name()}">
+                            <span th:case="'active'" class="status-badge badge-success" style="font-size: 14px; padding: 8px 16px;">Hoạt động</span>
+                            <span th:case="'inactive'" class="status-badge badge-warning" style="font-size: 14px; padding: 8px 16px;">Vô hiệu</span>
+                        </th:block>
+                    </div>
+                </div>
+
+                <!-- Info Content -->
+                <div style="padding: 30px;">
+                    <div style="display: grid; gap: 25px;">
+                        <!-- Email -->
+                        <div>
+                            <label style="display: block; font-size: 12px; color: #999; text-transform: uppercase; margin-bottom: 8px;">
+                                <i class="fas fa-envelope"></i> Email
+                            </label>
+                            <div style="font-size: 16px; font-weight: 600; color: #333;" th:text="${nguoiDung.email}">email@example.com</div>
+                        </div>
+
+                        <!-- Vai trò -->
+                        <div>
+                            <label style="display: block; font-size: 12px; color: #999; text-transform: uppercase; margin-bottom: 8px;">
+                                <i class="fas fa-user-tag"></i> Vai trò
+                            </label>
+                            <th:block th:switch="${nguoiDung.vaiTro.name()}">
+                                <span th:case="'admin'" class="status-badge badge-danger">Admin</span>
+                                <span th:case="'khach_hang'" class="status-badge badge-info">Khách hàng</span>
+                            </th:block>
+                        </div>
+
+                        <!-- SĐT -->
+                        <div>
+                            <label style="display: block; font-size: 12px; color: #999; text-transform: uppercase; margin-bottom: 8px;">
+                                <i class="fas fa-phone"></i> Số điện thoại
+                            </label>
+                            <div style="font-size: 16px; font-weight: 600; color: #333;"
+                                 th:text="${nguoiDung.sdt != null ? nguoiDung.sdt : 'Chưa cập nhật'}">0123456789</div>
+                        </div>
+
+                        <!-- Địa chỉ -->
+                        <div>
+                            <label style="display: block; font-size: 12px; color: #999; text-transform: uppercase; margin-bottom: 8px;">
+                                <i class="fas fa-map-marker-alt"></i> Địa chỉ
+                            </label>
+                            <div style="font-size: 15px; color: #666; line-height: 1.6;"
+                                 th:text="${nguoiDung.diaChi != null ? nguoiDung.diaChi : 'Chưa cập nhật'}">123 Đường ABC, Quận XYZ</div>
+                        </div>
+
+                        <!-- Ngày đăng ký -->
+                        <div>
+                            <label style="display: block; font-size: 12px; color: #999; text-transform: uppercase; margin-bottom: 8px;">
+                                <i class="fas fa-calendar-alt"></i> Ngày đăng ký
+                            </label>
+                            <div style="font-size: 15px; font-weight: 600; color: #333;">
+                                <span th:text="${#temporals.format(nguoiDung.ngayDangKy, 'dd/MM/yyyy HH:mm')}">25/12/2024 14:30</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Right Column - Actions -->
+        <div>
+            <!-- Actions Card -->
+            <div style="background: white; border-radius: 12px; box-shadow: 0 2px 8px rgba(0,0,0,0.06); margin-bottom: 20px;">
+                <div style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; padding: 15px 20px; border-radius: 12px 12px 0 0;">
+                    <h3 style="font-size: 16px; margin: 0;"><i class="fas fa-cog"></i> Thao tác</h3>
+                </div>
+                <div style="padding: 20px; display: grid; gap: 12px;">
+                    <a th:href="@{'/admin/nguoi-dung/sua/' + ${nguoiDung.id}}"
+                       style="display: block; padding: 12px; background: linear-gradient(135deg, #4caf50 0%, #66bb6a 100%); color: white; border-radius: 8px; text-align: center; text-decoration: none; font-weight: 600;">
+                        <i class="fas fa-edit"></i> Chỉnh sửa thông tin
+                    </a>
+
+
+
+                    <form th:action="@{'/admin/nguoi-dung/xoa/' + ${nguoiDung.id}}" method="post"
+                          onsubmit="return confirm('⚠️ Bạn có chắc muốn xóa người dùng này?')">
+                        <button type="submit"
+                                style="width: 100%; padding: 12px; background: linear-gradient(135deg, #ff6b6b 0%, #ff8787 100%); color: white; border-radius: 8px; border: none; font-weight: 600; cursor: pointer;">
+                            <i class="fas fa-trash"></i> Xóa người dùng
+                        </button>
+                    </form>
+                </div>
+            </div>
+
+            <!-- Back Button -->
+            <a href="/admin/nguoi-dung"
+               style="display: block; padding: 12px; background: #f5f7fa; color: #666; border-radius: 8px; text-align: center; text-decoration: none; font-weight: 600;">
+                <i class="fas fa-arrow-left"></i> Quay lại danh sách
+            </a>
+        </div>
+    </div>
+</main>
+</body>
+</html>

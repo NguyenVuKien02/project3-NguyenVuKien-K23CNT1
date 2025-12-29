@@ -1,0 +1,180 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head th:replace="admin/admin-layout :: head('Chi tiết đơn hàng')"></head>
+<body>
+<aside th:replace="admin/admin-layout :: sidebar('don-hang')"></aside>
+
+<main class="main-content">
+    <div th:replace="admin/admin-layout :: header('Chi tiết đơn hàng', 'fas fa-receipt')"></div>
+
+    <!-- Breadcrumb -->
+    <div style="display: flex; align-items: center; gap: 10px; padding: 15px 0; font-size: 14px; color: #666; margin-bottom: 20px;">
+        <a href="/admin/dashboard" style="color: #667eea; text-decoration: none;"><i class="fas fa-home"></i> Dashboard</a>
+        <i class="fas fa-chevron-right" style="font-size: 10px; color: #ccc;"></i>
+        <a href="/admin/don-hang" style="color: #667eea; text-decoration: none;">Đơn hàng</a>
+        <i class="fas fa-chevron-right" style="font-size: 10px; color: #ccc;"></i>
+        <span th:text="${donHang.maDonHang}">Chi tiết</span>
+    </div>
+
+    <!-- Alert -->
+    <div class="alert alert-success" th:if="${message}" style="margin-bottom: 20px;">
+        <i class="fas fa-check-circle"></i> <span th:text="${message}"></span>
+    </div>
+    <div class="alert alert-error" th:if="${error}" style="margin-bottom: 20px;">
+        <i class="fas fa-exclamation-circle"></i> <span th:text="${error}"></span>
+    </div>
+
+    <div style="display: grid; grid-template-columns: 2fr 1fr; gap: 25px;">
+        <!-- Left Column -->
+        <div>
+            <!-- Order Info -->
+            <div style="background: white; border-radius: 12px; box-shadow: 0 2px 8px rgba(0,0,0,0.06); margin-bottom: 20px;">
+                <div style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; padding: 20px; border-radius: 12px 12px 0 0;">
+                    <div style="display: flex; justify-content: space-between; align-items: center;">
+                        <div>
+                            <h3 style="font-size: 18px; margin: 0 0 5px 0;">
+                                <i class="fas fa-receipt"></i> <span th:text="${donHang.maDonHang}"></span>
+                            </h3>
+                            <div style="font-size: 13px; opacity: 0.9;">
+                                Đặt ngày: <span th:text="${#temporals.format(donHang.ngayDat, 'dd/MM/yyyy HH:mm')}"></span>
+                            </div>
+                        </div>
+                        <!-- SỬA: Dùng th:switch đơn giản hơn -->
+                        <th:block th:switch="${donHang.trangThai.name()}">
+                            <span th:case="'cho_xac_nhan'" class="status-badge badge-warning" style="font-size: 14px; padding: 8px 16px;">Chờ xác nhận</span>
+                            <span th:case="'dang_xu_ly'" class="status-badge badge-info" style="font-size: 14px; padding: 8px 16px;">Đang xử lý</span>
+                            <span th:case="'dang_giao'" class="status-badge badge-primary" style="font-size: 14px; padding: 8px 16px;">Đang giao</span>
+                            <span th:case="'da_giao'" class="status-badge badge-success" style="font-size: 14px; padding: 8px 16px;">Đã giao</span>
+                            <span th:case="'da_huy'" class="status-badge badge-danger" style="font-size: 14px; padding: 8px 16px;">Đã hủy</span>
+                        </th:block>
+                    </div>
+                </div>
+
+                <!-- Order Items -->
+                <div style="padding: 25px;">
+                    <h4 style="margin-bottom: 20px; color: #333;"><i class="fas fa-box"></i> Sản phẩm đã đặt</h4>
+
+                    <div th:each="ct : ${chiTietList}"
+                         style="display: flex; gap: 15px; padding: 15px; border: 1px solid #f0f0f0; border-radius: 8px; margin-bottom: 12px;">
+                        <img th:if="${ct.sanPham != null and ct.sanPham.anhDaiDien != null}"
+                             th:src="${ct.sanPham.anhDaiDien}"
+                             style="width: 70px; height: 90px; object-fit: cover; border-radius: 6px;">
+                        <div th:if="${ct.sanPham == null or ct.sanPham.anhDaiDien == null}"
+                             style="width: 70px; height: 90px; background: #f0f0f0; border-radius: 6px; display: flex; align-items: center; justify-content: center;">
+                            <i class="fas fa-image" style="font-size: 24px; color: #ccc;"></i>
+                        </div>
+
+                        <div style="flex: 1;">
+                            <div style="font-weight: 600; color: #333; margin-bottom: 5px;"
+                                 th:text="${ct.sanPham != null ? ct.sanPham.ten : 'Sản phẩm'}"></div>
+                            <div style="color: #999; font-size: 13px; margin-bottom: 8px;">
+                                Đơn giá: <span th:text="${#numbers.formatDecimal(ct.donGia, 0, 'COMMA', 0, 'POINT')}"></span>₫
+                            </div>
+                            <div style="display: flex; justify-content: space-between;">
+                                <span style="color: #666; font-size: 14px;">
+                                    Số lượng: <strong th:text="${ct.soLuong}"></strong>
+                                </span>
+                                <span style="font-size: 16px; font-weight: 700; color: #ff6b6b;">
+                                    <span th:text="${#numbers.formatDecimal(ct.thanhTien, 0, 'COMMA', 0, 'POINT')}"></span>₫
+                                </span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Total -->
+                    <div style="margin-top: 25px; padding-top: 20px; border-top: 2px solid #f0f0f0;">
+                        <div style="display: flex; justify-content: space-between; align-items: center;">
+                            <span style="font-size: 18px; font-weight: 700; color: #333;">Tổng tiền:</span>
+                            <span style="font-size: 24px; font-weight: 700; color: #ff6b6b;">
+                                <span th:text="${#numbers.formatDecimal(donHang.tongTien, 0, 'COMMA', 0, 'POINT')}"></span>₫
+                            </span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Customer Info -->
+            <div style="background: white; border-radius: 12px; box-shadow: 0 2px 8px rgba(0,0,0,0.06);">
+                <div style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; padding: 15px 20px; border-radius: 12px 12px 0 0;">
+                    <h3 style="font-size: 16px; margin: 0;"><i class="fas fa-user"></i> Thông tin khách hàng</h3>
+                </div>
+                <div style="padding: 25px; display: grid; gap: 20px;">
+                    <div>
+                        <label style="font-size: 12px; color: #999; text-transform: uppercase; margin-bottom: 5px; display: block;">Tên khách hàng</label>
+                        <!-- SỬA: hoTen thay vì ten -->
+                        <div style="font-size: 16px; font-weight: 600; color: #333;"
+                             th:text="${donHang.nguoiDung != null ? donHang.nguoiDung.hoTen : 'N/A'}"></div>
+                    </div>
+                    <div>
+                        <label style="font-size: 12px; color: #999; text-transform: uppercase; margin-bottom: 5px; display: block;">Số điện thoại</label>
+                        <div style="font-size: 16px; font-weight: 600; color: #333;">
+                            <i class="fas fa-phone" style="color: #667eea;"></i>
+                            <span th:text="${donHang.sdtNguoiNhan}"></span>
+                        </div>
+                    </div>
+                    <div>
+                        <label style="font-size: 12px; color: #999; text-transform: uppercase; margin-bottom: 5px; display: block;">Địa chỉ giao hàng</label>
+                        <div style="font-size: 15px; color: #666; line-height: 1.6;" th:text="${donHang.diaChiGiaoHang}"></div>
+                    </div>
+                    <div th:if="${donHang.ghiChu != null and !donHang.ghiChu.isEmpty()}">
+                        <label style="font-size: 12px; color: #999; text-transform: uppercase; margin-bottom: 5px; display: block;">Ghi chú</label>
+                        <div style="font-size: 14px; color: #666; font-style: italic; background: #f8f9fa; padding: 12px; border-radius: 6px;"
+                             th:text="${donHang.ghiChu}"></div>
+                    </div>
+                    <div>
+                        <label style="font-size: 12px; color: #999; text-transform: uppercase; margin-bottom: 5px; display: block;">Phương thức thanh toán</label>
+                        <div style="font-size: 15px; font-weight: 600; color: #333;" th:text="${donHang.phuongThucThanhToan}"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Right Column -->
+        <div>
+            <!-- Status Update -->
+            <div style="background: white; border-radius: 12px; box-shadow: 0 2px 8px rgba(0,0,0,0.06); margin-bottom: 20px;">
+                <div style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; padding: 15px 20px; border-radius: 12px 12px 0 0;">
+                    <h3 style="font-size: 16px; margin: 0;"><i class="fas fa-tasks"></i> Cập nhật trạng thái</h3>
+                </div>
+                <div style="padding: 20px;">
+                    <form th:action="@{'/admin/don-hang/' + ${donHang.id} + '/cap-nhat-trang-thai'}" method="post">
+                        <select name="trangThai"
+                                style="width: 100%; padding: 12px; border: 2px solid #e0e0e0; border-radius: 8px; margin-bottom: 15px; font-size: 14px;">
+                            <option value="cho_xac_nhan" th:selected="${donHang.trangThai.name() == 'cho_xac_nhan'}">Chờ xác nhận</option>
+                            <option value="dang_xu_ly" th:selected="${donHang.trangThai.name() == 'dang_xu_ly'}">Đang xử lý</option>
+                            <option value="dang_giao" th:selected="${donHang.trangThai.name() == 'dang_giao'}">Đang giao</option>
+                            <option value="da_giao" th:selected="${donHang.trangThai.name() == 'da_giao'}">Đã giao</option>
+                        </select>
+                        <button type="submit"
+                                style="width: 100%; padding: 12px; background: linear-gradient(135deg, #4caf50 0%, #66bb6a 100%); color: white; border: none; border-radius: 8px; font-weight: 600; cursor: pointer;">
+                            <i class="fas fa-save"></i> Cập nhật
+                        </button>
+                    </form>
+                </div>
+            </div>
+
+            <!-- Cancel Order -->
+            <div th:if="${donHang.trangThai.name() != 'da_giao' and donHang.trangThai.name() != 'da_huy'}"
+                 style="background: white; border-radius: 12px; box-shadow: 0 2px 8px rgba(0,0,0,0.06); margin-bottom: 20px;">
+                <div style="padding: 20px;">
+                    <form th:action="@{'/admin/don-hang/' + ${donHang.id} + '/huy'}"
+                          method="post"
+                          onsubmit="return confirm('⚠️ Bạn có chắc muốn hủy đơn hàng này?')">
+                        <button type="submit"
+                                style="width: 100%; padding: 12px; background: linear-gradient(135deg, #ff6b6b 0%, #ff8787 100%); color: white; border: none; border-radius: 8px; font-weight: 600; cursor: pointer;">
+                            <i class="fas fa-times-circle"></i> Hủy đơn hàng
+                        </button>
+                    </form>
+                </div>
+            </div>
+
+            <!-- Back Button -->
+            <a href="/admin/don-hang"
+               style="display: block; padding: 12px; background: #f5f7fa; color: #666; border-radius: 8px; text-align: center; text-decoration: none; font-weight: 600;">
+                <i class="fas fa-arrow-left"></i> Quay lại danh sách
+            </a>
+        </div>
+    </div>
+</main>
+</body>
+</html>

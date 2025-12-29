@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head th:replace="admin/admin-layout :: head('Thêm danh mục')"></head>
+<body>
+<aside th:replace="admin/admin-layout :: sidebar('danh-muc')"></aside>
+
+<main class="main-content">
+    <div th:replace="admin/admin-layout :: header('Thêm danh mục', 'fas fa-folder-plus')"></div>
+
+    <!-- Breadcrumb -->
+    <div style="display: flex; align-items: center; gap: 10px; padding: 15px 0; font-size: 14px; color: #666; margin-bottom: 20px;">
+        <a href="/admin/dashboard" style="color: #667eea; text-decoration: none;"><i class="fas fa-home"></i> Dashboard</a>
+        <i class="fas fa-chevron-right" style="font-size: 10px; color: #ccc;"></i>
+        <a href="/admin/danh-muc" style="color: #667eea; text-decoration: none;">Danh mục</a>
+        <i class="fas fa-chevron-right" style="font-size: 10px; color: #ccc;"></i>
+        <span>Thêm mới</span>
+    </div>
+
+    <!-- Alert -->
+    <div class="alert alert-error" th:if="${error}" style="margin-bottom: 20px;">
+        <i class="fas fa-exclamation-circle"></i> <span th:text="${error}"></span>
+    </div>
+
+    <!-- Form -->
+    <div class="content-section" style="max-width: 800px;">
+        <form th:action="@{/admin/danh-muc/them}" method="post">
+            <div style="display: grid; gap: 20px;">
+                <!-- Tên danh mục -->
+                <div>
+                    <label style="display: block; margin-bottom: 8px; font-weight: 600; color: #333;">
+                        Tên danh mục <span style="color: red;">*</span>
+                    </label>
+                    <input type="text" name="ten" required
+                           style="width: 100%; padding: 12px; border: 2px solid #e0e0e0; border-radius: 8px;"
+                           placeholder="Ví dụ: Sách văn học">
+                </div>
+
+                <!-- Danh mục cha -->
+                <div>
+                    <label style="display: block; margin-bottom: 8px; font-weight: 600; color: #333;">
+                        Danh mục cha
+                    </label>
+                    <select name="danhMucChaId"
+                            style="width: 100%; padding: 12px; border: 2px solid #e0e0e0; border-radius: 8px;">
+                        <option value="">-- Không có (Danh mục gốc) --</option>
+                        <option th:each="dm : ${danhMucCha}"
+                                th:value="${dm.id}"
+                                th:text="${dm.ten}">Danh mục cha</option>
+                    </select>
+                    <small style="color: #999; font-size: 13px;">
+                        <i class="fas fa-info-circle"></i>
+                        Để trống nếu đây là danh mục gốc (danh mục cha)
+                    </small>
+                </div>
+
+                <!-- Mô tả -->
+                <div>
+                    <label style="display: block; margin-bottom: 8px; font-weight: 600; color: #333;">
+                        Mô tả
+                    </label>
+                    <textarea name="moTa" rows="4"
+                              style="width: 100%; padding: 12px; border: 2px solid #e0e0e0; border-radius: 8px; resize: vertical;"
+                              placeholder="Nhập mô tả về danh mục..."></textarea>
+                </div>
+            </div>
+
+            <!-- Buttons -->
+            <div style="display: flex; gap: 10px; margin-top: 25px;">
+                <button type="submit" class="btn btn-primary" style="flex: 1;">
+                    <i class="fas fa-save"></i> Thêm danh mục
+                </button>
+                <a href="/admin/danh-muc" class="btn btn-secondary" style="flex: 1; text-align: center;">
+                    <i class="fas fa-times"></i> Hủy
+                </a>
+            </div>
+        </form>
+    </div>
+
+    <!-- Info Card -->
+    <div style="max-width: 800px; margin-top: 20px; background: #e3f2fd; border-left: 4px solid #2196f3; padding: 15px; border-radius: 8px;">
+        <h4 style="margin: 0 0 10px 0; color: #1976d2; font-size: 15px;">
+            <i class="fas fa-lightbulb"></i> Lưu ý về cấu trúc danh mục
+        </h4>
+        <ul style="margin: 0; padding-left: 20px; color: #555; font-size: 14px; line-height: 1.8;">
+            <li><strong>Danh mục cha</strong>: Để trống "Danh mục cha" để tạo danh mục gốc</li>
+            <li><strong>Danh mục con</strong>: Chọn danh mục cha để tạo danh mục con</li>
+            <li><strong>Ví dụ</strong>:
+                <br>└ Sách (cha)
+                <br>&nbsp;&nbsp;&nbsp;├ Văn học (con)
+                <br>&nbsp;&nbsp;&nbsp;└ Khoa học (con)
+            </li>
+        </ul>
+    </div>
+</main>
+</body>
+</html>

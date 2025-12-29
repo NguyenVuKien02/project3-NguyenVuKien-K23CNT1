@@ -1,0 +1,244 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head th:replace="admin/admin-layout :: head('Quản lý đơn hàng')"></head>
+<body>
+<aside th:replace="admin/admin-layout :: sidebar('don-hang')"></aside>
+
+<main class="main-content">
+    <div th:replace="admin/admin-layout :: header('Quản lý đơn hàng', 'fas fa-shopping-cart')"></div>
+
+    <!-- Alert -->
+    <div class="alert alert-success" th:if="${message}" style="margin-bottom: 20px;">
+        <i class="fas fa-check-circle"></i>
+        <span th:text="${message}"></span>
+    </div>
+
+    <!-- Statistics Cards -->
+    <div style="display: grid; grid-template-columns: repeat(6, 1fr); gap: 15px; margin-bottom: 25px;">
+        <div style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; padding: 20px; border-radius: 10px;">
+            <div style="font-size: 13px; opacity: 0.9; margin-bottom: 8px;">Tổng đơn</div>
+            <div style="font-size: 28px; font-weight: 700;" th:text="${totalOrders}">0</div>
+        </div>
+
+        <div style="background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%); color: white; padding: 20px; border-radius: 10px;">
+            <div style="font-size: 13px; opacity: 0.9; margin-bottom: 8px;">Chờ XN</div>
+            <div style="font-size: 28px; font-weight: 700;" th:text="${choXacNhan}">0</div>
+        </div>
+
+        <div style="background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%); color: white; padding: 20px; border-radius: 10px;">
+            <div style="font-size: 13px; opacity: 0.9; margin-bottom: 8px;">Đang xử lý</div>
+            <div style="font-size: 28px; font-weight: 700;" th:text="${dangXuLy}">0</div>
+        </div>
+
+        <div style="background: linear-gradient(135deg, #fa709a 0%, #fee140 100%); color: white; padding: 20px; border-radius: 10px;">
+            <div style="font-size: 13px; opacity: 0.9; margin-bottom: 8px;">Đang giao</div>
+            <div style="font-size: 28px; font-weight: 700;" th:text="${dangGiao}">0</div>
+        </div>
+
+        <div style="background: linear-gradient(135deg, #43e97b 0%, #38f9d7 100%); color: white; padding: 20px; border-radius: 10px;">
+            <div style="font-size: 13px; opacity: 0.9; margin-bottom: 8px;">Đã giao</div>
+            <div style="font-size: 28px; font-weight: 700;" th:text="${daGiao}">0</div>
+        </div>
+
+        <div style="background: linear-gradient(135deg, #ff6b6b 0%, #ff8787 100%); color: white; padding: 20px; border-radius: 10px;">
+            <div style="font-size: 13px; opacity: 0.9; margin-bottom: 8px;">Đã hủy</div>
+            <div style="font-size: 28px; font-weight: 700;" th:text="${daHuy}">0</div>
+        </div>
+    </div>
+
+    <!-- Filters -->
+    <div class="content-section" style="margin-bottom: 20px;">
+        <!-- Search Form -->
+        <form th:action="@{/admin/don-hang}" method="get" style="display: flex; gap: 10px; margin-bottom: 15px;">
+            <input type="text" name="keyword" th:value="${keyword}"
+                   placeholder="Tìm theo mã đơn, SĐT..."
+                   style="flex: 1; padding: 10px 15px; border: 2px solid #e0e0e0; border-radius: 8px;">
+            <button type="submit" class="btn btn-primary">
+                <i class="fas fa-search"></i> Tìm
+            </button>
+            <a href="/admin/don-hang" class="btn btn-secondary" th:if="${keyword}">
+                <i class="fas fa-times"></i>
+            </a>
+        </form>
+
+        <!-- Filter Buttons -->
+        <div style="display: flex; gap: 8px; flex-wrap: wrap;">
+            <a href="/admin/don-hang" class="filter-btn" th:classappend="${trangThai == null} ? 'active' : ''">
+                Tất cả
+            </a>
+            <a th:href="@{/admin/don-hang(trangThai='cho_xac_nhan')}" class="filter-btn"
+               th:classappend="${trangThai == 'cho_xac_nhan'} ? 'active' : ''">
+                Chờ XN
+            </a>
+            <a th:href="@{/admin/don-hang(trangThai='dang_xu_ly')}" class="filter-btn"
+               th:classappend="${trangThai == 'dang_xu_ly'} ? 'active' : ''">
+                Đang xử lý
+            </a>
+            <a th:href="@{/admin/don-hang(trangThai='dang_giao')}" class="filter-btn"
+               th:classappend="${trangThai == 'dang_giao'} ? 'active' : ''">
+                Đang giao
+            </a>
+            <a th:href="@{/admin/don-hang(trangThai='da_giao')}" class="filter-btn"
+               th:classappend="${trangThai == 'da_giao'} ? 'active' : ''">
+                Đã giao
+            </a>
+            <a th:href="@{/admin/don-hang(trangThai='da_huy')}" class="filter-btn"
+               th:classappend="${trangThai == 'da_huy'} ? 'active' : ''">
+                Đã hủy
+            </a>
+        </div>
+    </div>
+
+    <!-- Orders Table -->
+    <div class="content-section">
+        <table style="width: 100%; border-collapse: collapse;">
+            <thead style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white;">
+            <tr>
+                <th style="padding: 14px 10px; text-align: left; width: 150px;">Mã đơn</th>
+                <th style="padding: 14px 10px; text-align: left; width: 180px;">Khách hàng</th>
+                <th style="padding: 14px 10px; text-align: left; width: 130px;">SĐT</th>
+                <th style="padding: 14px 10px; text-align: right; width: 120px;">Tổng tiền</th>
+                <th style="padding: 14px 10px; text-align: center; width: 150px;">Trạng thái</th>
+                <th style="padding: 14px 10px; text-align: center; width: 140px;">Ngày đặt</th>
+                <th style="padding: 14px 10px; text-align: center; width: 100px;">Thao tác</th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr th:each="dh : ${donHangPage.content}" style="border-bottom: 1px solid #f0f0f0;">
+                <!-- Mã đơn -->
+                <td style="padding: 15px 10px;">
+                    <a th:href="@{'/admin/don-hang/' + ${dh.id}}"
+                       style="color: #667eea; font-weight: 600; text-decoration: none;">
+                        <i class="fas fa-receipt"></i>
+                        <span th:text="${dh.maDonHang}">DH001</span>
+                    </a>
+                </td>
+
+                <!-- Khách hàng -->
+                <td style="padding: 15px 10px;">
+                    <div style="font-weight: 600; color: #333;"
+                         th:text="${dh.nguoiDung != null ? dh.nguoiDung.hoTen : 'N/A'}">Khách hàng</div>
+                </td>
+
+                <!-- SĐT -->
+                <td style="padding: 15px 10px;">
+                    <span th:text="${dh.sdtNguoiNhan}" style="color: #666;">0123456789</span>
+                </td>
+
+                <!-- Tổng tiền -->
+                <td style="padding: 15px 10px; text-align: right;">
+                    <div style="font-size: 16px; font-weight: 700; color: #ff6b6b;">
+                        <span th:text="${#numbers.formatDecimal(dh.tongTien, 0, 'COMMA', 0, 'POINT')}">100,000</span>₫
+                    </div>
+                </td>
+
+                <!-- Trạng thái - ĐƠN GIẢN HÓA -->
+                <td style="padding: 15px 10px; text-align: center;">
+                    <th:block th:switch="${dh.trangThai.name()}">
+                        <span th:case="'cho_xac_nhan'" class="status-badge badge-warning">Chờ xác nhận</span>
+                        <span th:case="'dang_xu_ly'" class="status-badge badge-info">Đang xử lý</span>
+                        <span th:case="'dang_giao'" class="status-badge badge-primary">Đang giao</span>
+                        <span th:case="'da_giao'" class="status-badge badge-success">Đã giao</span>
+                        <span th:case="'da_huy'" class="status-badge badge-danger">Đã hủy</span>
+                    </th:block>
+                </td>
+
+                <!-- Ngày đặt -->
+                <td style="padding: 15px 10px; text-align: center; color: #666; font-size: 13px;">
+                    <div th:text="${#temporals.format(dh.ngayDat, 'dd/MM/yyyy')}">25/12/2024</div>
+                    <div th:text="${#temporals.format(dh.ngayDat, 'HH:mm')}" style="color: #999; font-size: 12px;">14:30</div>
+                </td>
+
+                <!-- Thao tác -->
+                <td style="padding: 15px 10px; text-align: center;">
+                    <a th:href="@{'/admin/don-hang/' + ${dh.id}}"
+                       style="width: 34px; height: 34px; display: inline-flex; align-items: center; justify-content: center; background: #667eea; color: white; border-radius: 6px; text-decoration: none;">
+                        <i class="fas fa-eye"></i>
+                    </a>
+                </td>
+            </tr>
+            </tbody>
+        </table>
+
+        <!-- Empty State -->
+        <div th:if="${donHangPage.content.isEmpty()}"
+             style="text-align: center; padding: 60px 20px; color: #999;">
+            <i class="fas fa-shopping-cart" style="font-size: 64px; margin-bottom: 20px; opacity: 0.3;"></i>
+            <h3>Chưa có đơn hàng nào</h3>
+        </div>
+
+        <!-- Pagination -->
+        <div th:if="${donHangPage.totalPages > 1}"
+             style="display: flex; justify-content: center; gap: 8px; margin-top: 30px; padding: 20px;">
+            <a th:if="${donHangPage.number > 0}"
+               th:href="@{/admin/don-hang(page=${donHangPage.number - 1}, keyword=${keyword}, trangThai=${trangThai})}"
+               style="min-width: 40px; height: 40px; display: inline-flex; align-items: center; justify-content: center; background: white; border: 2px solid #e0e0e0; border-radius: 8px; color: #667eea; text-decoration: none;">
+                <i class="fas fa-chevron-left"></i>
+            </a>
+
+            <span th:each="i : ${#numbers.sequence(0, donHangPage.totalPages - 1)}"
+                  th:if="${i >= donHangPage.number - 2 and i <= donHangPage.number + 2}">
+                <a th:href="@{/admin/don-hang(page=${i}, keyword=${keyword}, trangThai=${trangThai})}"
+                   th:class="${i == donHangPage.number} ? 'page-active' : 'page-link'"
+                   th:text="${i + 1}">1</a>
+            </span>
+
+            <a th:if="${donHangPage.number < donHangPage.totalPages - 1}"
+               th:href="@{/admin/don-hang(page=${donHangPage.number + 1}, keyword=${keyword}, trangThai=${trangThai})}"
+               style="min-width: 40px; height: 40px; display: inline-flex; align-items: center; justify-content: center; background: white; border: 2px solid #e0e0e0; border-radius: 8px; color: #667eea; text-decoration: none;">
+                <i class="fas fa-chevron-right"></i>
+            </a>
+        </div>
+    </div>
+</main>
+
+<style>
+    .filter-btn {
+        padding: 10px 16px;
+        background: white;
+        border: 2px solid #e0e0e0;
+        border-radius: 8px;
+        color: #666;
+        text-decoration: none;
+        font-size: 13px;
+        font-weight: 600;
+        transition: all 0.3s;
+        white-space: nowrap;
+    }
+
+    .filter-btn:hover {
+        border-color: #667eea;
+        color: #667eea;
+    }
+
+    .filter-btn.active {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+        border-color: #667eea;
+    }
+
+    .page-link, .page-active {
+        min-width: 40px;
+        height: 40px;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        border: 2px solid #e0e0e0;
+        border-radius: 8px;
+        font-weight: 600;
+        text-decoration: none;
+    }
+
+    .page-link {
+        background: white;
+        color: #667eea;
+    }
+
+    .page-active {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+        border-color: #667eea;
+    }
+</style>
+</body>
+</html>

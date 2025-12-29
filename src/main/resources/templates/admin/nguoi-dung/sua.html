@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head th:replace="admin/admin-layout :: head('Sửa người dùng')"></head>
+<body>
+<aside th:replace="admin/admin-layout :: sidebar('nguoi-dung')"></aside>
+
+<main class="main-content">
+    <div th:replace="admin/admin-layout :: header('Sửa người dùng', 'fas fa-user-edit')"></div>
+
+    <!-- Breadcrumb -->
+    <div style="display: flex; align-items: center; gap: 10px; padding: 15px 0; font-size: 14px; color: #666; margin-bottom: 20px;">
+        <a href="/admin/dashboard" style="color: #667eea; text-decoration: none;"><i class="fas fa-home"></i> Dashboard</a>
+        <i class="fas fa-chevron-right" style="font-size: 10px; color: #ccc;"></i>
+        <a href="/admin/nguoi-dung" style="color: #667eea; text-decoration: none;">Người dùng</a>
+        <i class="fas fa-chevron-right" style="font-size: 10px; color: #ccc;"></i>
+        <span>Sửa</span>
+    </div>
+
+    <!-- Alert -->
+    <div class="alert alert-error" th:if="${error}" style="margin-bottom: 20px;">
+        <i class="fas fa-exclamation-circle"></i> <span th:text="${error}"></span>
+    </div>
+
+    <!-- Form -->
+    <div class="content-section" style="max-width: 800px;">
+        <form th:action="@{'/admin/nguoi-dung/sua/' + ${nguoiDung.id}}" method="post" th:object="${nguoiDung}">
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px;">
+                <!-- Họ tên -->
+                <div>
+                    <label style="display: block; margin-bottom: 8px; font-weight: 600; color: #333;">
+                        Họ và tên <span style="color: red;">*</span>
+                    </label>
+                    <input type="text" th:field="*{hoTen}" required
+                           style="width: 100%; padding: 12px; border: 2px solid #e0e0e0; border-radius: 8px;">
+                </div>
+
+                <!-- Email (readonly) -->
+                <div>
+                    <label style="display: block; margin-bottom: 8px; font-weight: 600; color: #333;">
+                        Email
+                    </label>
+                    <input type="email" th:value="*{email}" readonly
+                           style="width: 100%; padding: 12px; border: 2px solid #e0e0e0; border-radius: 8px; background: #f5f5f5; cursor: not-allowed;">
+                    <small style="color: #999;">Email không thể thay đổi</small>
+                </div>
+
+                <!-- Mật khẩu mới -->
+                <div>
+                    <label style="display: block; margin-bottom: 8px; font-weight: 600; color: #333;">
+                        Mật khẩu mới
+                    </label>
+                    <input type="password" name="matKhauMoi"
+                           style="width: 100%; padding: 12px; border: 2px solid #e0e0e0; border-radius: 8px;"
+                           placeholder="Để trống nếu không đổi">
+                    <small style="color: #999;">Để trống nếu không muốn đổi mật khẩu</small>
+                </div>
+
+                <!-- SĐT -->
+                <div>
+                    <label style="display: block; margin-bottom: 8px; font-weight: 600; color: #333;">
+                        Số điện thoại
+                    </label>
+                    <input type="text" th:field="*{sdt}"
+                           style="width: 100%; padding: 12px; border: 2px solid #e0e0e0; border-radius: 8px;">
+                </div>
+
+                <!-- Vai trò -->
+                <div>
+                    <label style="display: block; margin-bottom: 8px; font-weight: 600; color: #333;">
+                        Vai trò <span style="color: red;">*</span>
+                    </label>
+                    <select th:field="*{vaiTro}" required
+                            style="width: 100%; padding: 12px; border: 2px solid #e0e0e0; border-radius: 8px;">
+                        <option value="khach_hang">Khách hàng</option>
+                        <option value="admin">Admin</option>
+                    </select>
+                </div>
+
+                <!-- Trạng thái -->
+                <div>
+                    <label style="display: block; margin-bottom: 8px; font-weight: 600; color: #333;">
+                        Trạng thái <span style="color: red;">*</span>
+                    </label>
+                    <select th:field="*{trangThai}" required
+                            style="width: 100%; padding: 12px; border: 2px solid #e0e0e0; border-radius: 8px;">
+                        <option value="active">Hoạt động</option>
+                        <option value="inactive">Vô hiệu hóa</option>
+                    </select>
+                </div>
+
+                <!-- Địa chỉ -->
+                <div style="grid-column: 1 / -1;">
+                    <label style="display: block; margin-bottom: 8px; font-weight: 600; color: #333;">
+                        Địa chỉ
+                    </label>
+                    <textarea th:field="*{diaChi}" rows="3"
+                              style="width: 100%; padding: 12px; border: 2px solid #e0e0e0; border-radius: 8px; resize: vertical;"></textarea>
+                </div>
+
+                <!-- Ngày đăng ký (readonly) -->
+                <div>
+                    <label style="display: block; margin-bottom: 8px; font-weight: 600; color: #333;">
+                        Ngày đăng ký
+                    </label>
+                    <input type="text" th:value="${#temporals.format(nguoiDung.ngayDangKy, 'dd/MM/yyyy HH:mm')}" readonly
+                           style="width: 100%; padding: 12px; border: 2px solid #e0e0e0; border-radius: 8px; background: #f5f5f5; cursor: not-allowed;">
+                </div>
+            </div>
+
+            <!-- Buttons -->
+            <div style="display: flex; gap: 10px; margin-top: 25px;">
+                <button type="submit" class="btn btn-primary" style="flex: 1;">
+                    <i class="fas fa-save"></i> Cập nhật
+                </button>
+                <a href="/admin/nguoi-dung" class="btn btn-secondary" style="flex: 1; text-align: center;">
+                    <i class="fas fa-times"></i> Hủy
+                </a>
+            </div>
+        </form>
+    </div>
+</main>
+</body>
+</html>
